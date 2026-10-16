@@ -12,7 +12,7 @@ export default function AboutPage() {
       <header className="border-b-4 border-gold bg-ucu-blue text-white">
         <div className="mx-auto flex max-w-3xl items-center justify-between px-5 py-4">
           <Link href="/" className="flex items-center gap-3">
-            <Logo className="h-9 w-9" />
+            <Logo className="h-12 w-12" />
             <span className="text-lg font-semibold">Omega</span>
           </Link>
           <Link href="/login" className="text-sm text-gold">
@@ -34,7 +34,7 @@ export default function AboutPage() {
             Members coordinate workshops, talks, and study notes here. The circuit playground and Bloch sphere run in the browser, so a lab session still works when the network does not. Officers publish events, announcements, resources, and quizzes. Admins assign those roles.
           </p>
           <p>
-            Accounts are limited to <span className="font-medium">@students.ucu.ac.ug</span>. The placeholder mark on this page can be replaced with the official UCU logo at <code>public/logo.svg</code> and in the header component.
+            Accounts are limited to <span className="font-medium">@students.ucu.ac.ug</span>.
           </p>
         </div>
       </main>

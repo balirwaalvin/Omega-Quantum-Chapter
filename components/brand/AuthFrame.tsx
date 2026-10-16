@@ -40,7 +40,7 @@ export function AuthFrame({
       </section>
       <section className="flex flex-col bg-background">
         <div className="flex items-center gap-3 border-b border-gold/70 bg-ucu-blue px-5 py-4 text-white lg:hidden">
-          <Logo className="h-9 w-9" />
+          <Logo className="h-12 w-12" />
           <div>
             <p className="text-lg font-semibold">Omega</p>
             <p className="text-xs text-blue-100">UCU Quantum Computing Chapter</p>
