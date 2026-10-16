@@ -5,8 +5,8 @@ import { OmegaSignIn } from "@/components/auth/clerk-ui";
 export const metadata: Metadata = { title: "Sign in" };
 
 const reasons: Record<string, string> = {
-  domain: "Email sign-in must use a @students.ucu.ac.ug address. GitHub and LinkedIn can use any email on that account.",
-  deactivated: "This account has been deactivated. Contact a chapter admin.",
+  domain: "Use a @students.ucu.ac.ug email, GitHub, or LinkedIn.",
+  deactivated: "Account deactivated. Contact a chapter admin.",
 };
 
 export default async function LoginPage({
@@ -18,17 +18,18 @@ export default async function LoginPage({
   const message = reason ? reasons[reason] : undefined;
 
   return (
-    <AuthFrame title="Sign in to Omega">
+    <AuthFrame>
       {message ? (
-        <p className="mb-4 rounded-lg border border-magenta/30 bg-white px-3 py-2 text-sm text-magenta" role="alert">
+        <p
+          className="mb-3 w-full rounded-[5px] border border-magenta/50 bg-magenta/20 px-3 py-1.5 text-center text-xs font-medium text-pink-100"
+          role="alert"
+        >
           {message}
         </p>
-      ) : (
-        <p className="mb-4 text-sm text-muted">
-          Use a @students.ucu.ac.ug email, or continue with GitHub or LinkedIn. Social accounts can use any email they are registered with.
-        </p>
-      )}
+      ) : null}
       <OmegaSignIn />
     </AuthFrame>
   );
 }
+
+

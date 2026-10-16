@@ -1,17 +1,18 @@
 @import "tailwindcss";
 
 :root {
-  --background: #f4f6f8;
-  --foreground: #0f172a;
-  --ucu-blue: #003087;
-  --ucu-blue-bright: #1e3a8a;
+  --background: #f0f2f5;
+  --foreground: #1e293b;
+  --ucu-blue: #012e4a;
+  --ucu-blue-bright: #2767b9;
+  --alpha-blue: #2767b9;
   --forest: #1b5e20;
   --forest-bright: #228b22;
   --gold: #f1c40f;
   --gold-bright: #ffd700;
-  --magenta: #c2185b;
+  --magenta: #b5004f;
   --surface: #ffffff;
-  --muted: #475569;
+  --muted: #596579;
 }
 
 @theme inline {
@@ -19,6 +20,7 @@
   --color-foreground: var(--foreground);
   --color-ucu-blue: var(--ucu-blue);
   --color-ucu-blue-bright: var(--ucu-blue-bright);
+  --color-alpha-blue: var(--alpha-blue);
   --color-forest: var(--forest);
   --color-forest-bright: var(--forest-bright);
   --color-gold: var(--gold);
@@ -27,28 +29,92 @@
   --color-surface: var(--surface);
   --color-ink: var(--foreground);
   --color-muted: var(--muted);
-  --font-sans: var(--font-inter), "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-sans: var(--font-inter), "Inter", "Roboto", ui-sans-serif, system-ui, sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
   font-family: var(--font-sans);
+  overflow-x: hidden;
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+  background-color: #f5f5f5;
+}
+
+::-webkit-scrollbar-track {
+  box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.15);
+  border-radius: 10px;
+  background-color: #f5f5f5;
+}
+
+::-webkit-scrollbar-thumb {
+  border-radius: 10px;
+  box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.2);
+  background-image: linear-gradient(180deg, #2e5099 0%, #1e3d6b 100%);
 }
 
 :focus-visible {
-  outline: 2px solid var(--gold);
+  outline: 2px solid var(--alpha-blue);
   outline-offset: 2px;
+}
+
+.alpha-cover-bg {
+  background-color: #011c2e;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+.alpha-sidenav-bg {
+  background-image: linear-gradient(195deg, #012e4a 0%, #001829 100%);
+}
+
+.alpha-card-frame {
+  padding: 2px;
+  border-radius: 10px;
+  background: linear-gradient(to right, #2767b9 0%, #b5004f 100%);
+  box-shadow: rgba(0, 0, 0, 0.65) 0px 8px 24px;
+}
+
+.alpha-accent-bar {
+  background: linear-gradient(to right, #2767b9 75%, #b5004f 100%);
+}
+
+.alpha-gradient-pill {
+  background: linear-gradient(135deg, #2767b9 0%, #b5004f 100%);
+}
+
+.alpha-glass-nav {
+  background: rgba(255, 255, 255, 0.88);
+  backdrop-filter: saturate(200%) blur(24px);
 }
 
 .field {
   width: 100%;
-  border-radius: 0.65rem;
-  border: 1px solid #d6dde8;
-  background: white;
+  border-radius: 0.5rem;
+  border: 1px solid #cfd8e3;
+  background: #f7fbfc;
   padding: 0.55rem 0.75rem;
-  font-size: 0.925rem;
+  font-size: 0.9rem;
   color: var(--foreground);
+  transition: border-color 0.15s ease, background-color 0.15s ease;
+}
+
+.field:focus {
+  background: #ffffff;
+  border-color: var(--alpha-blue);
 }
 
 .btn {
@@ -56,39 +122,49 @@ body {
   align-items: center;
   justify-content: center;
   gap: 0.4rem;
-  border-radius: 0.65rem;
-  background: var(--ucu-blue);
-  padding: 0.55rem 0.95rem;
-  font-size: 0.925rem;
+  border-radius: 0.5rem;
+  background: linear-gradient(195deg, #2767b9 0%, #012e4a 100%);
+  padding: 0.55rem 1rem;
+  font-size: 0.875rem;
   font-weight: 600;
   color: white;
+  box-shadow: 0 2px 6px rgba(1, 46, 74, 0.22);
+  transition: filter 0.15s ease, transform 0.1s ease;
 }
 
 .btn:hover {
-  background: var(--ucu-blue-bright);
+  filter: brightness(1.08);
 }
 
 .btn-secondary {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  border-radius: 0.65rem;
-  border: 1px solid #c5d0e0;
-  background: white;
-  padding: 0.5rem 0.9rem;
-  font-size: 0.875rem;
+  gap: 0.4rem;
+  border-radius: 0.5rem;
+  border: 1px solid #cbd5e1;
+  background: #f7fbfc;
+  padding: 0.5rem 0.95rem;
+  font-size: 0.85rem;
   font-weight: 600;
   color: var(--ucu-blue);
+  transition: background-color 0.15s ease, border-color 0.15s ease;
+}
+
+.btn-secondary:hover {
+  background: #ffffff;
+  border-color: var(--alpha-blue);
 }
 
 .btn-danger {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  border-radius: 0.65rem;
-  background: #fde8f0;
+  border-radius: 0.5rem;
+  background: #fce7f0;
   padding: 0.45rem 0.75rem;
   font-size: 0.8rem;
   font-weight: 600;
   color: var(--magenta);
 }
+

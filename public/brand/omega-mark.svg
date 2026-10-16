@@ -1,13 +1,11 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64" role="img" aria-label="Omega">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Omega">
   <rect width="64" height="64" rx="14" fill="#003087"/>
-  <g fill="none" stroke="#FFFFFF" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round">
-    <path d="M23.6 44.2 A14.2 14.2 0 1 1 40.4 44.2"/>
-    <path d="M23.6 44.2 V50.2 H17.2"/>
-    <path d="M40.4 44.2 V50.2 H46.8"/>
+  <g fill="none" stroke="#FFFFFF" stroke-width="4.2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M16.5 49.5 H24.2 V43.2 A14.4 14.4 0 1 1 39.8 43.2 V49.5 H47.5"/>
   </g>
-  <g transform="rotate(-22 32 30.6)">
-    <ellipse cx="32" cy="30.6" rx="7.4" ry="3.15" fill="none" stroke="#F1C40F" stroke-width="1.25"/>
+  <g transform="rotate(-22 32 30)">
+    <ellipse cx="32" cy="30" rx="8.4" ry="3.6" fill="none" stroke="#F1C40F" stroke-width="1.6"/>
   </g>
-  <circle cx="32" cy="30.6" r="2.55" fill="#F1C40F"/>
-  <circle cx="38.5" cy="28.2" r="1.45" fill="#C2185B"/>
+  <circle cx="32" cy="30" r="2.7" fill="#F1C40F"/>
+  <circle cx="39.3" cy="27.1" r="1.75" fill="#C2185B"/>
 </svg>

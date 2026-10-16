@@ -1,12 +1,29 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { basisLabel, simulateCircuit, type CircuitGrid, type GateName, type PlacedGate } from "@/lib/quantum/simulate";
+import {
+  basisLabel,
+  simulateCircuit,
+  type CircuitGrid,
+  type GateName,
+  type PlacedGate,
+} from "@/lib/quantum/simulate";
 
 const tools: Array<GateName | "E"> = ["H", "X", "Y", "Z", "CNOT", "M", "E"];
 
+const gateColors: Record<GateName, string> = {
+  H: "border-ucu-blue bg-ucu-blue text-white shadow-xs",
+  X: "border-forest bg-forest text-white shadow-xs",
+  Y: "border-forest bg-forest text-white shadow-xs",
+  Z: "border-forest bg-forest text-white shadow-xs",
+  CNOT: "border-gold bg-gold text-ucu-blue shadow-xs",
+  M: "border-magenta bg-magenta text-white shadow-xs",
+};
+
 function emptyGrid(columns: number, qubits: number): CircuitGrid {
-  return Array.from({ length: columns }, () => Array.from({ length: qubits }, () => null));
+  return Array.from({ length: columns }, () =>
+    Array.from({ length: qubits }, () => null),
+  );
 }
 
 export function CircuitPlayground({
@@ -38,7 +55,10 @@ export function CircuitPlayground({
   const [error, setError] = useState("");
   const [running, setRunning] = useState(false);
 
-  const wireLabels = useMemo(() => Array.from({ length: qubits }, (_, index) => `q${index}`), [qubits]);
+  const wireLabels = useMemo(
+    () => Array.from({ length: qubits }, (_, index) => `q${index}`),
+    [qubits],
+  );
 
   function place(columnIndex: number, wire: number) {
     if (readOnly) return;
@@ -51,7 +71,9 @@ export function CircuitPlayground({
           return next;
         }
         const cell: PlacedGate = { gate: tool };
-        if (tool === "CNOT") cell.control = control === wire ? (wire + 1) % qubits : control;
+        if (tool === "CNOT") {
+          cell.control = control === wire ? (wire + 1) % qubits : control;
+        }
         next[wire] = cell;
         return next;
       }),
@@ -72,7 +94,10 @@ export function CircuitPlayground({
   }
 
   return (
-    <section className="rounded-2xl border border-slate-200 bg-white p-4" aria-labelledby="circuit-heading">
+    <section
+      className="rounded-2xl border border-slate-200 bg-white p-5 shadow-xs"
+      aria-labelledby="circuit-heading"
+    >
       <div className="flex flex-wrap items-center justify-between gap-3">
         <h2 id="circuit-heading" className="text-lg font-semibold text-ucu-blue">
           {title}
@@ -82,7 +107,11 @@ export function CircuitPlayground({
         </button>
       </div>
       {readOnly ? null : (
-        <div className="mt-3 flex flex-wrap gap-2" role="toolbar" aria-label="Gates">
+        <div
+          className="mt-3 flex flex-wrap items-center gap-2"
+          role="toolbar"
+          aria-label="Gates"
+        >
           {tools.map((item) => (
             <button
               key={item}
@@ -113,16 +142,29 @@ export function CircuitPlayground({
           ) : null}
         </div>
       )}
-      <div className="mt-4 overflow-x-auto">
-        <div className="inline-grid gap-2" style={{ gridTemplateColumns: `4rem repeat(${width}, 3.25rem)` }}>
-          <span />
+      <div className="mt-5 overflow-x-auto rounded-xl border border-slate-100 bg-slate-50/70 p-4">
+        <div
+          className="inline-grid items-center gap-y-3 gap-x-2"
+          style={{ gridTemplateColumns: `4.5rem repeat(${width}, 3.25rem)` }}
+        >
+          <span className="text-xs font-medium text-muted">Wire</span>
           {grid.map((_, index) => (
-            <span key={index} className="text-center text-xs text-muted">
-              {index}
+            <span
+              key={index}
+              className="text-center font-mono text-xs text-muted"
+            >
+              t{index}
             </span>
           ))}
           {wireLabels.map((label, wire) => (
-            <Wire key={label} label={label} wire={wire} grid={grid} onPlace={place} readOnly={readOnly} />
+            <Wire
+              key={label}
+              label={label}
+              wire={wire}
+              grid={grid}
+              onPlace={place}
+              readOnly={readOnly}
+            />
           ))}
         </div>
       </div>
@@ -132,18 +174,30 @@ export function CircuitPlayground({
           <h3 className="text-sm font-semibold text-ucu-blue">Probabilities</h3>
           <ul className="mt-2 grid gap-2">
             {probabilities.map((value, index) => (
-              <li key={index} className="grid grid-cols-[3rem_1fr_3rem] items-center gap-2 text-sm">
-                <span className="font-mono">{basisLabel(index, qubits)}</span>
-                <span className="h-2 overflow-hidden rounded-full bg-slate-100">
-                  <span className="block h-full bg-forest" style={{ width: `${Math.round(value * 100)}%` }} />
+              <li
+                key={index}
+                className="grid grid-cols-[3.5rem_1fr_3.5rem] items-center gap-2 text-sm"
+              >
+                <span className="font-mono text-xs font-medium">
+                  |{basisLabel(index, qubits)}⟩
                 </span>
-                <span>{(value * 100).toFixed(1)}%</span>
+                <span className="h-2.5 overflow-hidden rounded-full bg-slate-100">
+                  <span
+                    className="block h-full bg-forest transition-all"
+                    style={{ width: `${Math.round(value * 100)}%` }}
+                  />
+                </span>
+                <span className="text-right font-mono text-xs">
+                  {(value * 100).toFixed(1)}%
+                </span>
               </li>
             ))}
           </ul>
         </div>
       ) : (
-        <p className="mt-3 text-sm text-muted">Run the circuit to see measurement probabilities.</p>
+        <p className="mt-3 text-sm text-muted">
+          Run the circuit to see measurement probabilities.
+        </p>
       )}
       <p className="mt-3 text-xs text-muted">
         Bit strings follow quantum-circuit. The rightmost bit is q0.
@@ -167,7 +221,9 @@ function Wire({
 }) {
   return (
     <>
-      <span className="self-center text-sm font-medium text-ucu-blue">{label}</span>
+      <span className="self-center font-mono text-sm font-semibold text-ucu-blue">
+        |{label}⟩
+      </span>
       {grid.map((column, columnIndex) => {
         const cell = column[wire];
         const labelText = cell
@@ -176,16 +232,28 @@ function Wire({
             : cell.gate
           : "·";
         return (
-          <button
+          <div
             key={`${columnIndex}-${wire}`}
-            type="button"
-            disabled={readOnly}
-            onClick={() => onPlace(columnIndex, wire)}
-            className="h-12 rounded-lg border border-slate-200 bg-background text-xs font-semibold text-ink hover:border-gold disabled:cursor-default"
-            aria-label={`${label} column ${columnIndex}, ${cell ? cell.gate : "empty"}`}
+            className="relative flex items-center justify-center"
           >
-            {labelText}
-          </button>
+            <span
+              className="pointer-events-none absolute inset-x-0 h-0.5 bg-slate-300"
+              aria-hidden
+            />
+            <button
+              type="button"
+              disabled={readOnly}
+              onClick={() => onPlace(columnIndex, wire)}
+              className={`relative z-10 h-11 w-11 rounded-lg border text-xs font-bold transition-colors disabled:cursor-default ${
+                cell
+                  ? gateColors[cell.gate]
+                  : "border-slate-200 bg-white text-slate-400 hover:border-ucu-blue hover:text-ucu-blue"
+              }`}
+              aria-label={`${label} column ${columnIndex}, ${cell ? cell.gate : "empty"}`}
+            >
+              {labelText}
+            </button>
+          </div>
         );
       })}
     </>

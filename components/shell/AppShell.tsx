@@ -35,7 +35,7 @@ export function AppShell({
       >
         Skip to content
       </a>
-      <Header name={name} onMenu={() => setOpen(true)} />
+      <Header name={name} role={role} onMenu={() => setOpen(true)} />
       <div className="flex flex-1">
         <Sidebar role={role} open={open} onClose={() => setOpen(false)} />
         <main id="main" className="min-w-0 flex-1 px-4 py-6 md:px-8">

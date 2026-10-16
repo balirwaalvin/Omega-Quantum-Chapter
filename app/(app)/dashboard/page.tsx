@@ -31,83 +31,124 @@ export default async function DashboardPage({
 
   const shownEvents = upcomingOrRecent(events);
   const started = new Set(attempts.map((attempt) => attempt.quizId));
-  const progress = quizzes.length === 0 ? 0 : Math.round((started.size / quizzes.length) * 100);
+  const progress =
+    quizzes.length === 0 ? 0 : Math.round((started.size / quizzes.length) * 100);
 
   return (
     <div>
       <PageHeader
-        eyebrow="Chapter home"
-        title={`Hello, ${session.name.split(" ")[0] || "there"}`}
-        description="Upcoming sessions, announcements, and your learning progress."
+        eyebrow="Omega Portal"
+        title={`Welcome, ${session.name.split(" ")[0] || "Student"}`}
       />
       {notice === "forbidden" ? (
-        <p className="mb-4 rounded-lg border border-magenta/30 bg-white px-3 py-2 text-sm text-magenta" role="alert">
-          That area is for officers and admins.
+        <p
+          className="mb-4 rounded-lg border border-magenta/30 bg-white px-3 py-2 text-xs font-medium text-magenta"
+          role="alert"
+        >
+          Restricted to officers and admins.
         </p>
       ) : null}
+
       <section className="grid gap-3 sm:grid-cols-3">
-        <article className="rounded-2xl bg-ucu-blue p-4 text-white">
-          <p className="text-xs uppercase tracking-wide text-blue-100">Learning</p>
-          <p className="mt-2 text-3xl font-semibold">{progress}%</p>
-          <p className="text-sm text-blue-100">{started.size} of {quizzes.length} quizzes started</p>
+        <article className="alpha-sidenav-bg rounded-xl p-4 text-white shadow-xs">
+          <p className="text-[11px] font-bold uppercase tracking-wider text-[#7fb3ff]">
+            Progress
+          </p>
+          <p className="mt-1.5 text-2xl font-bold">{progress}%</p>
+          <p className="mt-0.5 text-xs text-slate-300">
+            {started.size} / {quizzes.length} quizzes
+          </p>
         </article>
-        <article className="rounded-2xl bg-forest p-4 text-white">
-          <p className="text-xs uppercase tracking-wide text-green-100">Library</p>
-          <p className="mt-2 text-3xl font-semibold">{resources.length}</p>
-          <p className="text-sm text-green-100">Published resources</p>
+        <article className="rounded-xl bg-[#2767b9] p-4 text-white shadow-xs">
+          <p className="text-[11px] font-bold uppercase tracking-wider text-blue-100">
+            Library
+          </p>
+          <p className="mt-1.5 text-2xl font-bold">{resources.length}</p>
+          <p className="mt-0.5 text-xs text-blue-100">Active modules</p>
         </article>
-        <article className="rounded-2xl border border-gold bg-white p-4">
-          <p className="text-xs uppercase tracking-wide text-forest">Quick actions</p>
-          <div className="mt-3 flex flex-col gap-2 text-sm font-semibold text-ucu-blue">
-            <Link href="/events">Browse events</Link>
-            <Link href="/playground">Open the playground</Link>
-            <Link href="/learn">Continue learning</Link>
+        <article className="rounded-xl border border-slate-200 bg-white p-4 shadow-2xs">
+          <p className="text-[11px] font-bold uppercase tracking-wider text-alpha-blue">
+            Quick Launch
+          </p>
+          <div className="mt-2 flex flex-wrap gap-2 text-xs font-semibold">
+            <Link href="/playground" className="btn-secondary py-1.5 px-2.5 text-xs">
+              Circuit Lab
+            </Link>
+            <Link href="/bloch" className="btn-secondary py-1.5 px-2.5 text-xs">
+              Bloch 3D
+            </Link>
+            <Link href="/learn" className="btn-secondary py-1.5 px-2.5 text-xs">
+              Learn
+            </Link>
           </div>
         </article>
       </section>
 
       {spotlight ? (
-        <section className="mt-6 rounded-2xl border border-gold bg-white p-5">
-          <p className="text-xs font-semibold uppercase tracking-[0.16em] text-forest">Quantum of the Week</p>
-          <h2 className="mt-1 text-xl font-semibold text-ucu-blue">{spotlight.title}</h2>
-          <p className="mt-2 text-sm text-muted">{spotlight.summary}</p>
-          <Link href={spotlight.href} className="btn mt-4">
-            Open the demo
-          </Link>
+        <section className="alpha-card-frame mt-5">
+          <div className=" flex flex-col justify-between gap-4 rounded-[8px] bg-white p-4 sm:flex-row sm:items-center sm:p-5">
+            <div>
+              <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-magenta">
+                Quantum Spotlight
+              </p>
+              <h2 className="mt-0.5 text-base font-bold text-ucu-blue sm:text-lg">
+                {spotlight.title}
+              </h2>
+              <p className="mt-1 text-xs text-muted sm:text-sm">
+                {spotlight.summary}
+              </p>
+            </div>
+            <Link href={spotlight.href} className="btn shrink-0">
+              Open Demo
+            </Link>
+          </div>
         </section>
       ) : null}
 
       <RoleGate role={session.role} allow={["officer", "admin"]}>
         {stats ? (
           <section className="mt-6" aria-labelledby="officer-heading">
-          <h2 id="officer-heading" className="text-lg font-semibold text-ucu-blue">Officer snapshot</h2>
-          <div className="mt-3 grid gap-3 sm:grid-cols-4">
-            <Stat label="Members" value={String(stats.totalMembers)} />
-            <Stat label="Active" value={String(stats.activeMembers)} />
-            <Stat label="RSVPs" value={String(stats.rsvpCount)} />
-            <Stat
-              label="Top resource"
-              value={stats.popularResources[0]?.title ?? "—"}
-            />
-          </div>
-          <Link href="/admin" className="btn mt-4">
-            Open admin dashboard
-          </Link>
+            <div className="flex items-center justify-between">
+              <h2 id="officer-heading" className="text-sm font-bold uppercase tracking-wider text-ucu-blue">
+                Admin Snapshot
+              </h2>
+              <Link href="/admin" className="text-xs font-semibold text-alpha-blue hover:underline">
+                Manage &rarr;
+              </Link>
+            </div>
+            <div className="mt-2.5 grid gap-3 sm:grid-cols-4">
+              <Stat label="Members" value={String(stats.totalMembers)} />
+              <Stat label="Active" value={String(stats.activeMembers)} />
+              <Stat label="RSVPs" value={String(stats.rsvpCount)} />
+              <Stat
+                label="Top Module"
+                value={stats.popularResources[0]?.title ?? "—"}
+              />
+            </div>
           </section>
         ) : null}
       </RoleGate>
 
-      <section className="mt-8">
-        <h2 className="text-lg font-semibold text-ucu-blue">Upcoming events</h2>
-        <div className="mt-3 grid gap-3 md:grid-cols-3">
+      <section className="mt-6">
+        <div className="flex items-center justify-between">
+          <h2 className="text-sm font-bold uppercase tracking-wider text-ucu-blue">
+            Upcoming Events
+          </h2>
+          <Link href="/events" className="text-xs font-semibold text-alpha-blue hover:underline">
+            All events &rarr;
+          </Link>
+        </div>
+        <div className="mt-2.5 grid gap-3 md:grid-cols-3">
           {shownEvents.map((event) => (
             <EventCard key={event.id} event={event} />
           ))}
         </div>
       </section>
 
-      <section className="mt-8 grid gap-3">
-        <h2 className="text-lg font-semibold text-ucu-blue">Announcements</h2>
+      <section className="mt-6 grid gap-2.5">
+        <h2 className="text-sm font-bold uppercase tracking-wider text-ucu-blue">
+          Announcements
+        </h2>
         {announcements.slice(0, 3).map((item) => (
           <AnnouncementCard key={item.id} item={item} />
         ))}
@@ -118,9 +159,14 @@ export default async function DashboardPage({
 
 function Stat({ label, value }: { label: string; value: string }) {
   return (
-    <article className="rounded-2xl border border-slate-200 bg-white p-3">
-      <p className="text-xs uppercase tracking-wide text-muted">{label}</p>
-      <p className="mt-1 line-clamp-2 text-lg font-semibold text-ucu-blue">{value}</p>
+    <article className="rounded-xl border border-slate-200 bg-white p-3 shadow-2xs">
+      <p className="text-[10px] font-bold uppercase tracking-wider text-muted">
+        {label}
+      </p>
+      <p className="mt-1 line-clamp-1 text-base font-bold text-ucu-blue">
+        {value}
+      </p>
     </article>
   );
 }
+
