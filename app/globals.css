@@ -253,4 +253,60 @@ body {
   animation: quantum-scanline 1.6s ease-in-out infinite;
 }
 
+@keyframes quantum-spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes quantum-spin-counter {
+  from { transform: rotate(360deg); }
+  to { transform: rotate(0deg); }
+}
+
+@keyframes quantum-ripple {
+  0% {
+    transform: scale(0.7);
+    opacity: 0.9;
+  }
+  100% {
+    transform: scale(2.2);
+    opacity: 0;
+  }
+}
+
+@keyframes quantum-circuit-flow {
+  0% { stroke-dashoffset: 60; }
+  100% { stroke-dashoffset: 0; }
+}
+
+@keyframes quantum-shimmer {
+  0% { transform: translateX(-150%) rotate(25deg); }
+  100% { transform: translateX(250%) rotate(25deg); }
+}
+
+.animate-quantum-spin-slow {
+  animation: quantum-spin 20s linear infinite;
+}
+
+.animate-quantum-spin-counter {
+  animation: quantum-spin-counter 15s linear infinite;
+}
+
+.animate-quantum-ripple-1 {
+  animation: quantum-ripple 2.8s cubic-bezier(0, 0.2, 0.8, 1) infinite;
+}
+
+.animate-quantum-ripple-2 {
+  animation: quantum-ripple 2.8s cubic-bezier(0, 0.2, 0.8, 1) infinite 1.4s;
+}
+
+.animate-quantum-circuit {
+  stroke-dasharray: 8 4;
+  animation: quantum-circuit-flow 2s linear infinite;
+}
+
+.animate-quantum-shimmer {
+  animation: quantum-shimmer 3s ease-in-out infinite;
+}
+
 
