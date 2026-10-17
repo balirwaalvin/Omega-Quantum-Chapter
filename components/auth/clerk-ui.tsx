@@ -46,11 +46,14 @@ export function OmegaSignIn() {
   const [step, setStep] = useState<"credentials" | "code">("credentials");
   const [factorType, setFactorType] = useState<"first" | "second">("first");
   const [loading, setLoading] = useState(false);
+  const [oauthLoading, setOauthLoading] = useState<"github" | "linkedin" | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [info, setInfo] = useState<string | null>(null);
 
   async function handleOAuth(strategy: "oauth_github" | "oauth_linkedin_oidc" | "oauth_linkedin") {
     if (!isLoaded || !signIn) return;
+    const provider = strategy === "oauth_github" ? "github" : "linkedin";
+    setOauthLoading(provider);
     setError(null);
     try {
       await signIn.authenticateWithRedirect({
@@ -68,10 +71,12 @@ export function OmegaSignIn() {
           });
           return;
         } catch (innerErr) {
+          setOauthLoading(null);
           setError(getClerkErrorMessage(innerErr, "Social sign-in failed."));
           return;
         }
       }
+      setOauthLoading(null);
       setError(getClerkErrorMessage(err, "Social sign-in failed."));
     }
   }
@@ -314,24 +319,86 @@ export function OmegaSignIn() {
           <button
             type="button"
             onClick={() => handleOAuth("oauth_github")}
-            disabled={!isLoaded || loading}
-            className="inline-flex items-center justify-center gap-2 rounded-[6px] bg-[#f7fbfc] px-3 py-2 text-xs font-semibold text-slate-900 shadow-xs transition hover:bg-white disabled:opacity-50"
+            disabled={!isLoaded || loading || oauthLoading !== null}
+            className="group relative inline-flex cursor-pointer items-center justify-center gap-2 rounded-[6px] border border-slate-300/80 bg-[#f7fbfc] px-3 py-2.5 text-xs font-semibold text-slate-900 shadow-sm transition-all duration-150 hover:scale-[1.02] hover:border-slate-400 hover:bg-white hover:shadow-md active:scale-[0.96] active:bg-slate-200 active:shadow-inner disabled:cursor-not-allowed disabled:opacity-50"
           >
-            <svg viewBox="0 0 24 24" className="h-4 w-4 fill-current shrink-0" aria-hidden="true">
-              <path d="M12 .5C5.65.5.5 5.65.5 12c0 5.09 3.29 9.4 7.86 10.92.58.1.79-.25.79-.56v-2c-3.2.7-3.88-1.38-3.88-1.38-.52-1.33-1.28-1.68-1.28-1.68-1.05-.72.08-.7.08-.7 1.16.08 1.77 1.19 1.77 1.19 1.03 1.76 2.7 1.25 3.36.96.1-.75.4-1.25.73-1.54-2.55-.29-5.24-1.28-5.24-5.68 0-1.26.45-2.28 1.18-3.09-.12-.29-.51-1.46.11-3.05 0 0 .97-.31 3.17 1.18a11 11 0 0 1 5.78 0c2.2-1.49 3.17-1.18 3.17-1.18.62 1.59.23 2.76.11 3.05.74.81 1.18 1.83 1.18 3.09 0 4.41-2.69 5.38-5.26 5.67.41.36.78 1.06.78 2.14v3.17c0 .31.21.67.8.56A11.51 11.51 0 0 0 23.5 12C23.5 5.65 18.35.5 12 .5Z" />
-            </svg>
-            <span>GitHub</span>
+            {oauthLoading === "github" ? (
+              <>
+                <svg
+                  className="h-3.5 w-3.5 animate-spin text-slate-800 shrink-0"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                >
+                  <circle
+                    className="opacity-25"
+                    cx="12"
+                    cy="12"
+                    r="10"
+                    stroke="currentColor"
+                    strokeWidth="4"
+                  />
+                  <path
+                    className="opacity-75"
+                    fill="currentColor"
+                    d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
+                  />
+                </svg>
+                <span className="font-bold text-slate-800">Connecting...</span>
+              </>
+            ) : (
+              <>
+                <svg
+                  viewBox="0 0 24 24"
+                  className="h-4 w-4 fill-current shrink-0 transition-transform group-hover:scale-110"
+                  aria-hidden="true"
+                >
+                  <path d="M12 .5C5.65.5.5 5.65.5 12c0 5.09 3.29 9.4 7.86 10.92.58.1.79-.25.79-.56v-2c-3.2.7-3.88-1.38-3.88-1.38-.52-1.33-1.28-1.68-1.28-1.68-1.05-.72.08-.7.08-.7 1.16.08 1.77 1.19 1.77 1.19 1.03 1.76 2.7 1.25 3.36.96.1-.75.4-1.25.73-1.54-2.55-.29-5.24-1.28-5.24-5.68 0-1.26.45-2.28 1.18-3.09-.12-.29-.51-1.46.11-3.05 0 0 .97-.31 3.17 1.18a11 11 0 0 1 5.78 0c2.2-1.49 3.17-1.18 3.17-1.18.62 1.59.23 2.76.11 3.05.74.81 1.18 1.83 1.18 3.09 0 4.41-2.69 5.38-5.26 5.67.41.36.78 1.06.78 2.14v3.17c0 .31.21.67.8.56A11.51 11.51 0 0 0 23.5 12C23.5 5.65 18.35.5 12 .5Z" />
+                </svg>
+                <span>GitHub</span>
+              </>
+            )}
           </button>
           <button
             type="button"
             onClick={() => handleOAuth("oauth_linkedin_oidc")}
-            disabled={!isLoaded || loading}
-            className="inline-flex items-center justify-center gap-2 rounded-[6px] bg-[#f7fbfc] px-3 py-2 text-xs font-semibold text-slate-900 shadow-xs transition hover:bg-white disabled:opacity-50"
+            disabled={!isLoaded || loading || oauthLoading !== null}
+            className="group relative inline-flex cursor-pointer items-center justify-center gap-2 rounded-[6px] border border-slate-300/80 bg-[#f7fbfc] px-3 py-2.5 text-xs font-semibold text-slate-900 shadow-sm transition-all duration-150 hover:scale-[1.02] hover:border-slate-400 hover:bg-white hover:shadow-md active:scale-[0.96] active:bg-slate-200 active:shadow-inner disabled:cursor-not-allowed disabled:opacity-50"
           >
-            <svg viewBox="0 0 24 24" className="h-4 w-4 fill-[#0A66C2] shrink-0" aria-hidden="true">
-              <path d="M20.45 20.45h-3.56v-5.57c0-1.33-.02-3.04-1.85-3.04-1.85 0-2.14 1.45-2.14 2.94v5.67H9.34V9h3.41v1.56h.05c.48-.9 1.64-1.85 3.37-1.85 3.6 0 4.27 2.37 4.27 5.46v6.28ZM5.34 7.43a2.06 2.06 0 1 1 0-4.12 2.06 2.06 0 0 1 0 4.12ZM7.12 20.45H3.56V9h3.56v11.45ZM22.22 0H1.77C.79 0 0 .77 0 1.72v20.56C0 23.23.79 24 1.77 24h20.45c.98 0 1.78-.77 1.78-1.72V1.72C24 .77 23.2 0 22.22 0Z" />
-            </svg>
-            <span>LinkedIn</span>
+            {oauthLoading === "linkedin" ? (
+              <>
+                <svg
+                  className="h-3.5 w-3.5 animate-spin text-[#0A66C2] shrink-0"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                >
+                  <circle
+                    className="opacity-25"
+                    cx="12"
+                    cy="12"
+                    r="10"
+                    stroke="currentColor"
+                    strokeWidth="4"
+                  />
+                  <path
+                    className="opacity-75"
+                    fill="currentColor"
+                    d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
+                  />
+                </svg>
+                <span className="font-bold text-[#0A66C2]">Connecting...</span>
+              </>
+            ) : (
+              <>
+                <svg
+                  viewBox="0 0 24 24"
+                  className="h-4 w-4 fill-[#0A66C2] shrink-0 transition-transform group-hover:scale-110"
+                  aria-hidden="true"
+                >
+                  <path d="M20.45 20.45h-3.56v-5.57c0-1.33-.02-3.04-1.85-3.04-1.85 0-2.14 1.45-2.14 2.94v5.67H9.34V9h3.41v1.56h.05c.48-.9 1.64-1.85 3.37-1.85 3.6 0 4.27 2.37 4.27 5.46v6.28ZM5.34 7.43a2.06 2.06 0 1 1 0-4.12 2.06 2.06 0 0 1 0 4.12ZM7.12 20.45H3.56V9h3.56v11.45ZM22.22 0H1.77C.79 0 0 .77 0 1.72v20.56C0 23.23.79 24 1.77 24h20.45c.98 0 1.78-.77 1.78-1.72V1.72C24 .77 23.2 0 22.22 0Z" />
+                </svg>
+                <span>LinkedIn</span>
+              </>
+            )}
           </button>
         </div>
 
@@ -394,10 +461,13 @@ export function OmegaSignUp() {
   const [code, setCode] = useState("");
   const [step, setStep] = useState<"register" | "verify">("register");
   const [loading, setLoading] = useState(false);
+  const [oauthLoading, setOauthLoading] = useState<"github" | "linkedin" | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   async function handleOAuth(strategy: "oauth_github" | "oauth_linkedin_oidc" | "oauth_linkedin") {
     if (!isLoaded || !signUp) return;
+    const provider = strategy === "oauth_github" ? "github" : "linkedin";
+    setOauthLoading(provider);
     setError(null);
     try {
       await signUp.authenticateWithRedirect({
@@ -415,10 +485,12 @@ export function OmegaSignUp() {
           });
           return;
         } catch (innerErr) {
+          setOauthLoading(null);
           setError(getClerkErrorMessage(innerErr, "Social sign-up failed."));
           return;
         }
       }
+      setOauthLoading(null);
       setError(getClerkErrorMessage(err, "Social sign-up failed."));
     }
   }
@@ -578,24 +650,86 @@ export function OmegaSignUp() {
         <button
           type="button"
           onClick={() => handleOAuth("oauth_github")}
-          disabled={!isLoaded || loading}
-          className="inline-flex items-center justify-center gap-2 rounded-[6px] bg-[#f7fbfc] px-3 py-2 text-xs font-semibold text-slate-900 shadow-xs transition hover:bg-white disabled:opacity-50"
+          disabled={!isLoaded || loading || oauthLoading !== null}
+          className="group relative inline-flex cursor-pointer items-center justify-center gap-2 rounded-[6px] border border-slate-300/80 bg-[#f7fbfc] px-3 py-2.5 text-xs font-semibold text-slate-900 shadow-sm transition-all duration-150 hover:scale-[1.02] hover:border-slate-400 hover:bg-white hover:shadow-md active:scale-[0.96] active:bg-slate-200 active:shadow-inner disabled:cursor-not-allowed disabled:opacity-50"
         >
-          <svg viewBox="0 0 24 24" className="h-4 w-4 fill-current shrink-0" aria-hidden="true">
-            <path d="M12 .5C5.65.5.5 5.65.5 12c0 5.09 3.29 9.4 7.86 10.92.58.1.79-.25.79-.56v-2c-3.2.7-3.88-1.38-3.88-1.38-.52-1.33-1.28-1.68-1.28-1.68-1.05-.72.08-.7.08-.7 1.16.08 1.77 1.19 1.77 1.19 1.03 1.76 2.7 1.25 3.36.96.1-.75.4-1.25.73-1.54-2.55-.29-5.24-1.28-5.24-5.68 0-1.26.45-2.28 1.18-3.09-.12-.29-.51-1.46.11-3.05 0 0 .97-.31 3.17 1.18a11 11 0 0 1 5.78 0c2.2-1.49 3.17-1.18 3.17-1.18.62 1.59.23 2.76.11 3.05.74.81 1.18 1.83 1.18 3.09 0 4.41-2.69 5.38-5.26 5.67.41.36.78 1.06.78 2.14v3.17c0 .31.21.67.8.56A11.51 11.51 0 0 0 23.5 12C23.5 5.65 18.35.5 12 .5Z" />
-          </svg>
-          <span>GitHub</span>
+          {oauthLoading === "github" ? (
+            <>
+              <svg
+                className="h-3.5 w-3.5 animate-spin text-slate-800 shrink-0"
+                viewBox="0 0 24 24"
+                fill="none"
+              >
+                <circle
+                  className="opacity-25"
+                  cx="12"
+                  cy="12"
+                  r="10"
+                  stroke="currentColor"
+                  strokeWidth="4"
+                />
+                <path
+                  className="opacity-75"
+                  fill="currentColor"
+                  d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
+                />
+              </svg>
+              <span className="font-bold text-slate-800">Connecting...</span>
+            </>
+          ) : (
+            <>
+              <svg
+                viewBox="0 0 24 24"
+                className="h-4 w-4 fill-current shrink-0 transition-transform group-hover:scale-110"
+                aria-hidden="true"
+              >
+                <path d="M12 .5C5.65.5.5 5.65.5 12c0 5.09 3.29 9.4 7.86 10.92.58.1.79-.25.79-.56v-2c-3.2.7-3.88-1.38-3.88-1.38-.52-1.33-1.28-1.68-1.28-1.68-1.05-.72.08-.7.08-.7 1.16.08 1.77 1.19 1.77 1.19 1.03 1.76 2.7 1.25 3.36.96.1-.75.4-1.25.73-1.54-2.55-.29-5.24-1.28-5.24-5.68 0-1.26.45-2.28 1.18-3.09-.12-.29-.51-1.46.11-3.05 0 0 .97-.31 3.17 1.18a11 11 0 0 1 5.78 0c2.2-1.49 3.17-1.18 3.17-1.18.62 1.59.23 2.76.11 3.05.74.81 1.18 1.83 1.18 3.09 0 4.41-2.69 5.38-5.26 5.67.41.36.78 1.06.78 2.14v3.17c0 .31.21.67.8.56A11.51 11.51 0 0 0 23.5 12C23.5 5.65 18.35.5 12 .5Z" />
+              </svg>
+              <span>GitHub</span>
+            </>
+          )}
         </button>
         <button
           type="button"
           onClick={() => handleOAuth("oauth_linkedin_oidc")}
-          disabled={!isLoaded || loading}
-          className="inline-flex items-center justify-center gap-2 rounded-[6px] bg-[#f7fbfc] px-3 py-2 text-xs font-semibold text-slate-900 shadow-xs transition hover:bg-white disabled:opacity-50"
+          disabled={!isLoaded || loading || oauthLoading !== null}
+          className="group relative inline-flex cursor-pointer items-center justify-center gap-2 rounded-[6px] border border-slate-300/80 bg-[#f7fbfc] px-3 py-2.5 text-xs font-semibold text-slate-900 shadow-sm transition-all duration-150 hover:scale-[1.02] hover:border-slate-400 hover:bg-white hover:shadow-md active:scale-[0.96] active:bg-slate-200 active:shadow-inner disabled:cursor-not-allowed disabled:opacity-50"
         >
-          <svg viewBox="0 0 24 24" className="h-4 w-4 fill-[#0A66C2] shrink-0" aria-hidden="true">
-            <path d="M20.45 20.45h-3.56v-5.57c0-1.33-.02-3.04-1.85-3.04-1.85 0-2.14 1.45-2.14 2.94v5.67H9.34V9h3.41v1.56h.05c.48-.9 1.64-1.85 3.37-1.85 3.6 0 4.27 2.37 4.27 5.46v6.28ZM5.34 7.43a2.06 2.06 0 1 1 0-4.12 2.06 2.06 0 0 1 0 4.12ZM7.12 20.45H3.56V9h3.56v11.45ZM22.22 0H1.77C.79 0 0 .77 0 1.72v20.56C0 23.23.79 24 1.77 24h20.45c.98 0 1.78-.77 1.78-1.72V1.72C24 .77 23.2 0 22.22 0Z" />
-          </svg>
-          <span>LinkedIn</span>
+          {oauthLoading === "linkedin" ? (
+            <>
+              <svg
+                className="h-3.5 w-3.5 animate-spin text-[#0A66C2] shrink-0"
+                viewBox="0 0 24 24"
+                fill="none"
+              >
+                <circle
+                  className="opacity-25"
+                  cx="12"
+                  cy="12"
+                  r="10"
+                  stroke="currentColor"
+                  strokeWidth="4"
+                />
+                <path
+                  className="opacity-75"
+                  fill="currentColor"
+                  d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
+                />
+              </svg>
+              <span className="font-bold text-[#0A66C2]">Connecting...</span>
+            </>
+          ) : (
+            <>
+              <svg
+                viewBox="0 0 24 24"
+                className="h-4 w-4 fill-[#0A66C2] shrink-0 transition-transform group-hover:scale-110"
+                aria-hidden="true"
+              >
+                <path d="M20.45 20.45h-3.56v-5.57c0-1.33-.02-3.04-1.85-3.04-1.85 0-2.14 1.45-2.14 2.94v5.67H9.34V9h3.41v1.56h.05c.48-.9 1.64-1.85 3.37-1.85 3.6 0 4.27 2.37 4.27 5.46v6.28ZM5.34 7.43a2.06 2.06 0 1 1 0-4.12 2.06 2.06 0 0 1 0 4.12ZM7.12 20.45H3.56V9h3.56v11.45ZM22.22 0H1.77C.79 0 0 .77 0 1.72v20.56C0 23.23.79 24 1.77 24h20.45c.98 0 1.78-.77 1.78-1.72V1.72C24 .77 23.2 0 22.22 0Z" />
+              </svg>
+              <span>LinkedIn</span>
+            </>
+          )}
         </button>
       </div>
 
