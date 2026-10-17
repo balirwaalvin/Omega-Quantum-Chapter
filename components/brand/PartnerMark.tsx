@@ -37,16 +37,16 @@ export function PartnerMark({
 export function AlphaCardLogoBanner() {
   return (
     <div className="w-full overflow-hidden">
-      <div className="bg-[#f8f8f8] px-4 py-2.5 text-center">
+      <div className="bg-[#f8f8f8] px-4 py-3 text-center">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src="/brand/ucu.png"
           alt="Uganda Christian University"
-          className="mx-auto max-h-[84px] w-auto object-contain select-none"
+          className="mx-auto max-h-[72px] sm:max-h-[80px] w-auto object-contain select-none"
         />
       </div>
       <div
-        className="h-2.5 w-full"
+        className="h-[3px] w-full"
         style={{
           background: "linear-gradient(to right, #2767b9 80%, #b5004f 100%)",
         }}

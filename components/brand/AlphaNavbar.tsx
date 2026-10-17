@@ -1,107 +1,228 @@
+"use client";
+
+import { useState } from "react";
 import Link from "next/link";
-import { OmegaLockup } from "@/components/brand/Logo";
 
 const navItems = [
   {
+    name: "Home",
     href: "/",
-    label: "Portal",
     external: false,
     icon: (
-      <path
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        d="M3.75 6A2.25 2.25 0 0 1 6 3.75h2.25A2.25 2.25 0 0 1 10.5 6v2.25a2.25 2.25 0 0 1-2.25 2.25H6a2.25 2.25 0 0 1-2.25-2.25V6ZM3.75 15.75A2.25 2.25 0 0 1 6 13.5h2.25a2.25 2.25 0 0 1 2.25 2.25V18a2.25 2.25 0 0 1-2.25 2.25H6A2.25 2.25 0 0 1 3.75 18v-2.25ZM13.5 6a2.25 2.25 0 0 1 2.25-2.25H18A2.25 2.25 0 0 1 20.25 6v2.25A2.25 2.25 0 0 1 18 10.5h-2.25a2.25 2.25 0 0 1-2.25-2.25V6ZM13.5 15.75a2.25 2.25 0 0 1 2.25-2.25H18a2.25 2.25 0 0 1 2.25 2.25V18A2.25 2.25 0 0 1 18 20.25h-2.25A2.25 2.25 0 0 1 13.5 18v-2.25Z"
-      />
+      <svg
+        viewBox="0 0 24 24"
+        fill="currentColor"
+        className="h-4 w-4 shrink-0"
+        aria-hidden="true"
+      >
+        <path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z" />
+      </svg>
     ),
   },
   {
-    href: "/about",
-    label: "About",
-    external: false,
-    icon: (
-      <path
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        d="M12 21v-8.25M15.75 21v-8.25M8.25 21v-8.25M3 9l9-6 9 6m-1.5 12V10.332A48.36 48.36 0 0 0 12 9.75c-2.551 0-5.056.2-7.5.582V21M3 21h18M12 6.75h.008v.008H12V6.75Z"
-      />
-    ),
-  },
-  {
-    href: "https://alpha.ucu.ac.ug",
-    label: "Alpha MIS",
+    name: "Profiles",
+    href: "https://alpha.ucu.ac.ug/mis/profiles/",
     external: true,
     icon: (
-      <path
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        d="M12 21a9.004 9.004 0 0 0 8.716-6.747M12 21a9.004 9.004 0 0 1-8.716-6.747M12 21c2.485 0 4.5-4.03 4.5-9S14.485 3 12 3m0 18c-2.485 0-4.5-4.03-4.5-9S9.515 3 12 3m0 0a8.997 8.997 0 0 1 7.843 4.582M12 3a8.997 8.997 0 0 0-7.843 4.582m15.686 0A11.953 11.953 0 0 1 12 10.5c-2.998 0-5.74-1.1-7.843-2.918m15.686 0A8.959 8.959 0 0 1 21 12c0 .778-.099 1.533-.284 2.253m0 0A17.919 17.919 0 0 1 12 16.5c-3.162 0-6.133-.815-8.716-2.247m0 0A9.015 9.015 0 0 1 3 12c0-1.605.42-3.113 1.157-4.418"
-      />
+      <svg
+        viewBox="0 0 24 24"
+        fill="currentColor"
+        className="h-4 w-4 shrink-0"
+        aria-hidden="true"
+      >
+        <path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z" />
+      </svg>
     ),
   },
   {
-    href: "/login",
-    label: "Sign In",
-    external: false,
+    name: "Careers",
+    href: "https://alpha.ucu.ac.ug/careers",
+    external: true,
     icon: (
-      <path
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        d="M15.75 5.25a3 3 0 0 1 3 3m3 0a6 6 0 0 1-7.029 5.912c-.563-.097-1.159.026-1.563.43L10.5 17.25H8.25v2.25H6v2.25H2.25v-2.818c0-.597.237-1.17.659-1.591l6.499-6.499c.404-.404.527-1 .43-1.563A6 6 0 1 1 21.75 8.25Z"
-      />
+      <svg
+        viewBox="0 0 24 24"
+        fill="currentColor"
+        className="h-4 w-4 shrink-0"
+        aria-hidden="true"
+      >
+        <path d="M20 6h-4V4c0-1.11-.89-2-2-2h-4c-1.11 0-2 .89-2 2v2H4c-1.11 0-1.99.89-1.99 2L2 19c0 1.11.89 2 2 2h16c1.1 0 2-.89 2-2V8c0-1.11-.89-2-2-2zm-6 0h-4V4h4v2z" />
+      </svg>
+    ),
+  },
+  {
+    name: "Staff Email",
+    href: "https://mailx.ucu.ac.ug/",
+    external: true,
+    icon: (
+      <svg
+        viewBox="0 0 24 24"
+        fill="currentColor"
+        className="h-4 w-4 shrink-0"
+        aria-hidden="true"
+      >
+        <path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z" />
+      </svg>
+    ),
+  },
+  {
+    name: "Student Email",
+    href: "https://students.ucu.ac.ug/",
+    external: true,
+    icon: (
+      <svg
+        viewBox="0 0 24 24"
+        fill="currentColor"
+        className="h-4 w-4 shrink-0"
+        aria-hidden="true"
+      >
+        <path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 14H4V8l8 5 8-5v10zm-8-7L4 6h16l-8 5z" />
+      </svg>
     ),
   },
 ];
 
-export function AlphaNavbar() {
-  return (
-    <div className="mx-auto w-full max-w-6xl px-3 pt-3 sm:px-5 sm:pt-4">
-      <header className="alpha-glass-nav flex flex-wrap items-center justify-between gap-3 rounded-xl border border-white/60 px-4 py-2.5 text-ink shadow-md">
-        <Link href="/" className="inline-flex items-center">
-          <OmegaLockup size="sm" theme="light" />
-        </Link>
+export function AlphaNavbar({
+  position = "bottom",
+}: {
+  position?: "top" | "bottom";
+} = {}) {
+  const [mobileOpen, setMobileOpen] = useState(false);
 
-        <nav
-          aria-label="Portal navigation"
-          className="flex flex-wrap items-center gap-1 sm:gap-2"
+  const isBottom = position === "bottom";
+
+  return (
+    <footer className="relative w-full">
+      {/* Mobile Dropdown Menu (renders above bottom bar if at bottom) */}
+      {mobileOpen && (
+        <div
+          className={`mx-4 rounded-xl border border-white/15 bg-black/85 p-3 shadow-2xl backdrop-blur-xl md:hidden ${
+            isBottom ? "mb-2" : "mt-1 mb-3"
+          }`}
         >
-          {navItems.map((item) => {
-            const content = (
-              <>
-                <svg
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth={1.8}
-                  className="h-4 w-4 shrink-0 opacity-75"
-                  aria-hidden
+          <nav className="flex flex-col space-y-1">
+            {navItems.map((item) => {
+              const linkClasses =
+                "flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-white/90 hover:bg-white/15 hover:text-white transition-colors";
+
+              return item.external ? (
+                <a
+                  key={item.name}
+                  href={item.href}
+                  target="_blank"
+                  rel="noreferrer"
+                  onClick={() => setMobileOpen(false)}
+                  className={linkClasses}
                 >
                   {item.icon}
-                </svg>
-                <span>{item.label}</span>
-              </>
-            );
+                  <span>{item.name}</span>
+                </a>
+              ) : (
+                <Link
+                  key={item.name}
+                  href={item.href}
+                  onClick={() => setMobileOpen(false)}
+                  className={linkClasses}
+                >
+                  {item.icon}
+                  <span>{item.name}</span>
+                </Link>
+              );
+            })}
+          </nav>
+        </div>
+      )}
 
-            const className =
-              "inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-xs font-semibold text-ucu-blue transition-colors hover:bg-ucu-blue/8 sm:text-[13px]";
+      <div
+        className={`mx-auto flex w-full max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8 ${
+          isBottom ? "py-4 pb-6 sm:py-5" : "pt-5 pb-3 sm:pt-6"
+        }`}
+      >
+        {/* Brand title: text only, no logo graphic, reference https://alpha.ucu.ac.ug */}
+        <div className="flex flex-col items-start pr-2">
+          <Link
+            href="/"
+            className="group inline-flex flex-wrap items-baseline text-white transition-opacity hover:opacity-95"
+          >
+            <span className="text-sm font-bold uppercase tracking-wider text-white sm:text-base">
+              OMEGA
+            </span>
+            <span className="ml-1.5 text-xs font-normal text-white/90 sm:text-sm">
+              Quantum Computing Chapter
+            </span>
+          </Link>
+          <p className="mt-0.5 text-[11px] text-white/70">
+            Department Of Computing &amp; Technology
+          </p>
+        </div>
+
+        {/* Desktop Navigation */}
+        <nav
+          aria-label="Main navigation"
+          className="hidden items-center gap-1 md:flex lg:gap-2"
+        >
+          {navItems.map((item) => {
+            const linkClasses =
+              "inline-flex items-center gap-1.5 rounded-md px-2.5 py-1.5 text-xs font-medium text-white/90 transition-all hover:bg-white/10 hover:text-white sm:text-[13px]";
 
             return item.external ? (
               <a
-                key={item.label}
+                key={item.name}
                 href={item.href}
                 target="_blank"
                 rel="noreferrer"
-                className={className}
+                className={linkClasses}
               >
-                {content}
+                {item.icon}
+                <span>{item.name}</span>
               </a>
             ) : (
-              <Link key={item.label} href={item.href} className={className}>
-                {content}
+              <Link key={item.name} href={item.href} className={linkClasses}>
+                {item.icon}
+                <span>{item.name}</span>
               </Link>
             );
           })}
         </nav>
-      </header>
-    </div>
+
+        {/* Mobile Hamburger Button */}
+        <button
+          type="button"
+          onClick={() => setMobileOpen((prev) => !prev)}
+          className="inline-flex items-center justify-center rounded-lg p-2 text-white hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-white/40 md:hidden"
+          aria-label="Toggle navigation menu"
+          aria-expanded={mobileOpen}
+        >
+          {mobileOpen ? (
+            <svg
+              className="h-6 w-6"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M6 18L18 6M6 6l12 12"
+              />
+            </svg>
+          ) : (
+            <svg
+              className="h-6 w-6"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M4 6h16M4 12h16M4 18h16"
+              />
+            </svg>
+          )}
+        </button>
+      </div>
+    </footer>
   );
 }

@@ -233,27 +233,48 @@ export function OmegaSignIn() {
       ) : null}
 
       {step === "credentials" ? (
-        <form onSubmit={handleSubmitCredentials} className="space-y-2.5">
-          <div>
+        <>
+          <form onSubmit={handleSubmitCredentials} className="space-y-3">
+          <div className="relative">
+            <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400">
+              <svg
+                viewBox="0 0 24 24"
+                fill="currentColor"
+                className="h-4 w-4"
+                aria-hidden="true"
+              >
+                <path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z" />
+              </svg>
+            </div>
             <input
               type="email"
               required
               autoComplete="email"
-              placeholder="Student Email (@students.ucu.ac.ug)"
+              placeholder="Username or UCU email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full rounded-[5px] bg-[#f7fbfc] px-3 py-2 text-xs font-medium text-slate-900 placeholder:text-slate-500 focus:outline-2 focus:outline-[#2767b9]"
+              className="w-full rounded-[6px] bg-[#f7fbfc] py-2.5 pr-3 pl-9.5 text-xs font-medium text-slate-900 placeholder:text-slate-500 focus:bg-white focus:outline-2 focus:outline-[#2767b9]"
             />
           </div>
 
           <div className="relative">
+            <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400">
+              <svg
+                viewBox="0 0 24 24"
+                fill="currentColor"
+                className="h-4 w-4"
+                aria-hidden="true"
+              >
+                <path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z" />
+              </svg>
+            </div>
             <input
               type={showPassword ? "text" : "password"}
               autoComplete="current-password"
-              placeholder="Password (or leave blank for email code)"
+              placeholder="Password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full rounded-[5px] bg-[#f7fbfc] py-2 pr-14 pl-3 text-xs font-medium text-slate-900 placeholder:text-slate-500 focus:outline-2 focus:outline-[#2767b9]"
+              className="w-full rounded-[6px] bg-[#f7fbfc] py-2.5 pr-14 pl-9.5 text-xs font-medium text-slate-900 placeholder:text-slate-500 focus:bg-white focus:outline-2 focus:outline-[#2767b9]"
             />
             <button
               type="button"
@@ -264,7 +285,7 @@ export function OmegaSignIn() {
             </button>
           </div>
 
-          <div className="flex items-center justify-between pt-0.5">
+          <div className="flex items-center justify-between pt-1">
             <button
               type="button"
               onClick={handleSendEmailCode}
@@ -276,13 +297,45 @@ export function OmegaSignIn() {
             <button
               type="submit"
               disabled={loading || !isLoaded}
-              className="rounded-[5px] bg-[#2767b9] px-4 py-1.5 text-xs font-bold uppercase tracking-wider text-white shadow-xs transition hover:bg-[#1f569d] disabled:opacity-50"
+              className="rounded-[6px] bg-[#2767b9] px-5 py-2 text-xs font-bold uppercase tracking-wider text-white shadow-xs transition hover:bg-[#1f569d] disabled:opacity-50"
             >
               {loading ? "Wait..." : "Sign In"}
             </button>
           </div>
         </form>
-      ) : (
+
+        <div className="my-3.5 flex items-center gap-3">
+          <div className="h-px flex-1 bg-white/15" />
+          <span className="text-[10px] font-semibold uppercase tracking-wider text-slate-400">or</span>
+          <div className="h-px flex-1 bg-white/15" />
+        </div>
+
+        <div className="grid grid-cols-2 gap-2.5">
+          <button
+            type="button"
+            onClick={() => handleOAuth("oauth_github")}
+            disabled={!isLoaded || loading}
+            className="inline-flex items-center justify-center gap-2 rounded-[6px] bg-[#f7fbfc] px-3 py-2 text-xs font-semibold text-slate-900 shadow-xs transition hover:bg-white disabled:opacity-50"
+          >
+            <svg viewBox="0 0 24 24" className="h-4 w-4 fill-current shrink-0" aria-hidden="true">
+              <path d="M12 .5C5.65.5.5 5.65.5 12c0 5.09 3.29 9.4 7.86 10.92.58.1.79-.25.79-.56v-2c-3.2.7-3.88-1.38-3.88-1.38-.52-1.33-1.28-1.68-1.28-1.68-1.05-.72.08-.7.08-.7 1.16.08 1.77 1.19 1.77 1.19 1.03 1.76 2.7 1.25 3.36.96.1-.75.4-1.25.73-1.54-2.55-.29-5.24-1.28-5.24-5.68 0-1.26.45-2.28 1.18-3.09-.12-.29-.51-1.46.11-3.05 0 0 .97-.31 3.17 1.18a11 11 0 0 1 5.78 0c2.2-1.49 3.17-1.18 3.17-1.18.62 1.59.23 2.76.11 3.05.74.81 1.18 1.83 1.18 3.09 0 4.41-2.69 5.38-5.26 5.67.41.36.78 1.06.78 2.14v3.17c0 .31.21.67.8.56A11.51 11.51 0 0 0 23.5 12C23.5 5.65 18.35.5 12 .5Z" />
+            </svg>
+            <span>GitHub</span>
+          </button>
+          <button
+            type="button"
+            onClick={() => handleOAuth("oauth_linkedin_oidc")}
+            disabled={!isLoaded || loading}
+            className="inline-flex items-center justify-center gap-2 rounded-[6px] bg-[#f7fbfc] px-3 py-2 text-xs font-semibold text-slate-900 shadow-xs transition hover:bg-white disabled:opacity-50"
+          >
+            <svg viewBox="0 0 24 24" className="h-4 w-4 fill-[#0A66C2] shrink-0" aria-hidden="true">
+              <path d="M20.45 20.45h-3.56v-5.57c0-1.33-.02-3.04-1.85-3.04-1.85 0-2.14 1.45-2.14 2.94v5.67H9.34V9h3.41v1.56h.05c.48-.9 1.64-1.85 3.37-1.85 3.6 0 4.27 2.37 4.27 5.46v6.28ZM5.34 7.43a2.06 2.06 0 1 1 0-4.12 2.06 2.06 0 0 1 0 4.12ZM7.12 20.45H3.56V9h3.56v11.45ZM22.22 0H1.77C.79 0 0 .77 0 1.72v20.56C0 23.23.79 24 1.77 24h20.45c.98 0 1.78-.77 1.78-1.72V1.72C24 .77 23.2 0 22.22 0Z" />
+            </svg>
+            <span>LinkedIn</span>
+          </button>
+        </div>
+      </>
+    ) : (
         <form onSubmit={handleVerifyCode} className="space-y-2.5">
           <input
             type="text"
@@ -316,48 +369,6 @@ export function OmegaSignIn() {
           </div>
         </form>
       )}
-
-      <div className="mt-3.5 grid grid-cols-2 gap-2">
-        <button
-          type="button"
-          onClick={() => handleOAuth("oauth_github")}
-          disabled={!isLoaded || loading}
-          className="inline-flex items-center justify-center gap-1.5 rounded-[5px] bg-[#f7fbfc] px-2.5 py-1.5 text-[11px] font-semibold text-slate-900 transition hover:bg-white"
-        >
-          <svg viewBox="0 0 24 24" className="h-3.5 w-3.5 fill-current" aria-hidden>
-            <path d="M12 .5C5.65.5.5 5.65.5 12c0 5.09 3.29 9.4 7.86 10.92.58.1.79-.25.79-.56v-2c-3.2.7-3.88-1.38-3.88-1.38-.52-1.33-1.28-1.68-1.28-1.68-1.05-.72.08-.7.08-.7 1.16.08 1.77 1.19 1.77 1.19 1.03 1.76 2.7 1.25 3.36.96.1-.75.4-1.25.73-1.54-2.55-.29-5.24-1.28-5.24-5.68 0-1.26.45-2.28 1.18-3.09-.12-.29-.51-1.46.11-3.05 0 0 .97-.31 3.17 1.18a11 11 0 0 1 5.78 0c2.2-1.49 3.17-1.18 3.17-1.18.62 1.59.23 2.76.11 3.05.74.81 1.18 1.83 1.18 3.09 0 4.41-2.69 5.38-5.26 5.67.41.36.78 1.06.78 2.14v3.17c0 .31.21.67.8.56A11.51 11.51 0 0 0 23.5 12C23.5 5.65 18.35.5 12 .5Z" />
-          </svg>
-          <span>GitHub</span>
-        </button>
-        <button
-          type="button"
-          onClick={() => handleOAuth("oauth_linkedin_oidc")}
-          disabled={!isLoaded || loading}
-          className="inline-flex items-center justify-center gap-1.5 rounded-[5px] bg-[#f7fbfc] px-2.5 py-1.5 text-[11px] font-semibold text-slate-900 transition hover:bg-white"
-        >
-          <svg viewBox="0 0 24 24" className="h-3.5 w-3.5 fill-[#0A66C2]" aria-hidden>
-            <path d="M20.45 20.45h-3.56v-5.57c0-1.33-.02-3.04-1.85-3.04-1.85 0-2.14 1.45-2.14 2.94v5.67H9.34V9h3.41v1.56h.05c.48-.9 1.64-1.85 3.37-1.85 3.6 0 4.27 2.37 4.27 5.46v6.28ZM5.34 7.43a2.06 2.06 0 1 1 0-4.12 2.06 2.06 0 0 1 0 4.12ZM7.12 20.45H3.56V9h3.56v11.45ZM22.22 0H1.77C.79 0 0 .77 0 1.72v20.56C0 23.23.79 24 1.77 24h20.45c.98 0 1.78-.77 1.78-1.72V1.72C24 .77 23.2 0 22.22 0Z" />
-          </svg>
-          <span>LinkedIn</span>
-        </button>
-      </div>
-
-      <div
-        className="mt-4 border-b-2 pb-2.5 text-center text-[11px] text-slate-300"
-        style={{
-          borderImageSlice: 1,
-          borderImageSource: "linear-gradient(to right, #000 0%, #b5004f 100%)",
-        }}
-      >
-        New student?{" "}
-        <Link href="/signup" className="font-semibold text-[#7fb3ff] hover:text-white">
-          Create account
-        </Link>
-      </div>
-
-      <p className="mt-2 text-center text-[10px] text-slate-300">
-        By signing in, I agree to the Terms &amp; Conditions
-      </p>
     </div>
   );
 }
@@ -553,21 +564,27 @@ export function OmegaSignUp() {
         </form>
       )}
 
-      <div className="mt-3 grid grid-cols-2 gap-2">
+      <div className="mt-3 grid grid-cols-2 gap-2.5">
         <button
           type="button"
           onClick={() => handleOAuth("oauth_github")}
           disabled={!isLoaded || loading}
-          className="inline-flex items-center justify-center gap-1.5 rounded-[5px] bg-[#f7fbfc] px-2.5 py-1.5 text-[11px] font-semibold text-slate-900 transition hover:bg-white"
+          className="inline-flex items-center justify-center gap-2 rounded-[6px] bg-[#f7fbfc] px-3 py-2 text-xs font-semibold text-slate-900 shadow-xs transition hover:bg-white disabled:opacity-50"
         >
+          <svg viewBox="0 0 24 24" className="h-4 w-4 fill-current shrink-0" aria-hidden="true">
+            <path d="M12 .5C5.65.5.5 5.65.5 12c0 5.09 3.29 9.4 7.86 10.92.58.1.79-.25.79-.56v-2c-3.2.7-3.88-1.38-3.88-1.38-.52-1.33-1.28-1.68-1.28-1.68-1.05-.72.08-.7.08-.7 1.16.08 1.77 1.19 1.77 1.19 1.03 1.76 2.7 1.25 3.36.96.1-.75.4-1.25.73-1.54-2.55-.29-5.24-1.28-5.24-5.68 0-1.26.45-2.28 1.18-3.09-.12-.29-.51-1.46.11-3.05 0 0 .97-.31 3.17 1.18a11 11 0 0 1 5.78 0c2.2-1.49 3.17-1.18 3.17-1.18.62 1.59.23 2.76.11 3.05.74.81 1.18 1.83 1.18 3.09 0 4.41-2.69 5.38-5.26 5.67.41.36.78 1.06.78 2.14v3.17c0 .31.21.67.8.56A11.51 11.51 0 0 0 23.5 12C23.5 5.65 18.35.5 12 .5Z" />
+          </svg>
           <span>GitHub</span>
         </button>
         <button
           type="button"
           onClick={() => handleOAuth("oauth_linkedin_oidc")}
           disabled={!isLoaded || loading}
-          className="inline-flex items-center justify-center gap-1.5 rounded-[5px] bg-[#f7fbfc] px-2.5 py-1.5 text-[11px] font-semibold text-slate-900 transition hover:bg-white"
+          className="inline-flex items-center justify-center gap-2 rounded-[6px] bg-[#f7fbfc] px-3 py-2 text-xs font-semibold text-slate-900 shadow-xs transition hover:bg-white disabled:opacity-50"
         >
+          <svg viewBox="0 0 24 24" className="h-4 w-4 fill-[#0A66C2] shrink-0" aria-hidden="true">
+            <path d="M20.45 20.45h-3.56v-5.57c0-1.33-.02-3.04-1.85-3.04-1.85 0-2.14 1.45-2.14 2.94v5.67H9.34V9h3.41v1.56h.05c.48-.9 1.64-1.85 3.37-1.85 3.6 0 4.27 2.37 4.27 5.46v6.28ZM5.34 7.43a2.06 2.06 0 1 1 0-4.12 2.06 2.06 0 0 1 0 4.12ZM7.12 20.45H3.56V9h3.56v11.45ZM22.22 0H1.77C.79 0 0 .77 0 1.72v20.56C0 23.23.79 24 1.77 24h20.45c.98 0 1.78-.77 1.78-1.72V1.72C24 .77 23.2 0 22.22 0Z" />
+          </svg>
           <span>LinkedIn</span>
         </button>
       </div>

@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { AlphaBackdrop } from "@/components/brand/AlphaBackdrop";
 import { AlphaNavbar } from "@/components/brand/AlphaNavbar";
-import { Footer } from "@/components/brand/Footer";
 import { AlphaCardLogoBanner } from "@/components/brand/PartnerMark";
 
 export const metadata: Metadata = { title: "About" };
@@ -32,9 +31,6 @@ export default function AboutPage() {
   return (
     <div className="relative flex min-h-screen flex-col justify-between text-white">
       <AlphaBackdrop />
-      <div className="relative z-10">
-        <AlphaNavbar />
-      </div>
 
       <main className="relative z-10 mx-auto flex w-full max-w-2xl flex-1 items-center justify-center px-4 py-8">
         <div className="alpha-card-frame w-full">
@@ -98,8 +94,8 @@ export default function AboutPage() {
         </div>
       </main>
 
-      <div className="relative z-10">
-        <Footer light />
+      <div className="relative z-10 w-full">
+        <AlphaNavbar position="bottom" />
       </div>
     </div>
   );
