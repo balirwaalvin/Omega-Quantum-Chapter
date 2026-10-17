@@ -168,3 +168,89 @@ body {
   color: var(--magenta);
 }
 
+/* Quantum Intro Animations */
+@keyframes quantum-orbit-1 {
+  0% { transform: rotateZ(0deg) rotateX(68deg) rotateZ(0deg); }
+  100% { transform: rotateZ(0deg) rotateX(68deg) rotateZ(360deg); }
+}
+
+@keyframes quantum-orbit-2 {
+  0% { transform: rotateZ(60deg) rotateX(68deg) rotateZ(0deg); }
+  100% { transform: rotateZ(60deg) rotateX(68deg) rotateZ(360deg); }
+}
+
+@keyframes quantum-orbit-3 {
+  0% { transform: rotateZ(120deg) rotateX(68deg) rotateZ(0deg); }
+  100% { transform: rotateZ(120deg) rotateX(68deg) rotateZ(360deg); }
+}
+
+@keyframes quantum-glow-pulse {
+  0%, 100% {
+    opacity: 0.55;
+    transform: scale(0.96);
+    filter: drop-shadow(0 0 25px rgba(39, 103, 185, 0.45));
+  }
+  50% {
+    opacity: 0.95;
+    transform: scale(1.04);
+    filter: drop-shadow(0 0 50px rgba(181, 0, 79, 0.7));
+  }
+}
+
+@keyframes quantum-float {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-6px);
+  }
+}
+
+@keyframes quantum-scanline {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+@keyframes quantum-flare {
+  0% {
+    opacity: 0;
+    transform: scale(0.6);
+  }
+  50% {
+    opacity: 0.85;
+    transform: scale(1.15);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.6);
+  }
+}
+
+.animate-quantum-orbit-1 {
+  animation: quantum-orbit-1 6s linear infinite;
+  transform-style: preserve-3d;
+}
+
+.animate-quantum-orbit-2 {
+  animation: quantum-orbit-2 7.5s linear infinite;
+  transform-style: preserve-3d;
+}
+
+.animate-quantum-orbit-3 {
+  animation: quantum-orbit-3 9s linear infinite;
+  transform-style: preserve-3d;
+}
+
+.animate-quantum-glow {
+  animation: quantum-glow-pulse 3.2s ease-in-out infinite;
+}
+
+.animate-quantum-float {
+  animation: quantum-float 4.5s ease-in-out infinite;
+}
+
+.animate-quantum-scanline {
+  animation: quantum-scanline 1.6s ease-in-out infinite;
+}
+
+

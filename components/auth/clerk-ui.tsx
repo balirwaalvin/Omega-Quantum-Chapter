@@ -334,6 +334,16 @@ export function OmegaSignIn() {
             <span>LinkedIn</span>
           </button>
         </div>
+
+        <div className="mt-3.5 text-center text-xs text-slate-300">
+          Don&apos;t have an account?{" "}
+          <Link
+            href="/signup"
+            className="font-semibold text-[#7fb3ff] hover:text-white hover:underline"
+          >
+            Create account
+          </Link>
+        </div>
       </>
     ) : (
         <form onSubmit={handleVerifyCode} className="space-y-2.5">
