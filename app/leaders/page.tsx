@@ -22,37 +22,55 @@ interface Leader {
 
 const leaders: Leader[] = [
   {
-    name: "Grace Namukasa",
-    role: "Chapter Lead & President",
-    affiliation: "Department Of Computing & Technology",
-    program: "BSc Computer Science · Year 4",
-    bio: "Leads the chapter's strategic vision, international hackathon teams, and quantum curriculum partnerships across Uganda Christian University.",
-    specialties: ["Quantum Algorithms", "VQE", "Strategic Leadership"],
-    initials: "GN",
-  },
-  {
-    name: "Joel Okello",
-    role: "Programs & Workshop Director",
-    affiliation: "Department Of Computing & Technology",
-    program: "BSc Information Technology · Year 4",
-    bio: "Coordinates the weekly quantum study circle, hands-on Qiskit labs, and hardware emulation bootcamps for new chapter recruits.",
-    specialties: ["Quantum Hardware", "Qiskit Labs", "Student Mentorship"],
-    initials: "JO",
-  },
-  {
-    name: "Amara Nakato",
-    role: "Technical & Research Coordinator",
+    name: "Ogenrrwoth Samuel",
+    role: "Chapter President",
     affiliation: "Department Of Computing & Technology",
     program: "BSc Computer Science · Year 3",
-    bio: "Oversees circuit design workshops, Bloch sphere visual experiments, and peer review for undergraduate quantum computing papers.",
-    specialties: ["Bloch Visuals", "Circuit Design", "Linear Algebra"],
-    initials: "AN",
+    bio: "Leads the chapter's executive board, strategic vision, institutional outreach, and coordinates overall student initiatives across Uganda Christian University.",
+    specialties: ["Executive Leadership", "Quantum Strategy", "Community Growth"],
+    initials: "OS",
+  },
+  {
+    name: "Kamwikara Sarah",
+    role: "Vice President",
+    affiliation: "Department Of Computing & Technology",
+    program: "BSc Electronics & Communications Engineering · Year 3",
+    bio: "Oversees chapter operations, student engagement, and inter-departmental collaborations with engineering for quantum hardware and communications.",
+    specialties: ["Quantum Communications", "Hardware Systems", "Operations"],
+    initials: "KS",
+  },
+  {
+    name: "Balirwa Alvin Daniel",
+    role: "Technical Lead",
+    affiliation: "Department Of Computing & Technology",
+    program: "BSc Information Technology · Year 3",
+    bio: "Directs technical architecture, quantum simulation platforms, hands-on Qiskit bootcamps, and software engineering across chapter projects.",
+    specialties: ["Quantum Simulation", "Technical Architecture", "Qiskit Labs"],
+    initials: "BA",
+  },
+  {
+    name: "Grace Wanja",
+    role: "General Secretary",
+    affiliation: "Department Of Computing & Technology",
+    program: "BSc Data Science · Year 3",
+    bio: "Coordinates official chapter documentation, executive communications, correspondence, and data-driven student membership tracking.",
+    specialties: ["Data Science", "Chapter Governance", "Communications"],
+    initials: "GW",
+  },
+  {
+    name: "Robert Wanyama",
+    role: "Assistant Technical Lead",
+    affiliation: "Department Of Computing & Technology",
+    program: "BSc Computer Science · Year 3",
+    bio: "Assists in technical workshop delivery, circuit simulation playground sessions, peer code review, and developer mentorship in weekly study circles.",
+    specialties: ["Circuit Simulation", "Algorithms", "Developer Mentorship"],
+    initials: "RW",
   },
   {
     name: "Faculty Advisory Board",
     role: "Academic Patrons & Mentors",
     affiliation: "Department Of Computing & Technology, UCU",
-    bio: "Guiding the chapter under the academic leadership of the Faculty of Engineering, Design and Technology to bridge university research with quantum innovation.",
+    bio: "Guiding the chapter under the academic stewardship of the Department of Computing & Technology to connect student research with quantum innovation.",
     specialties: ["Institutional Liaison", "Research Ethics", "Curriculum"],
     initials: "UCU",
   },
@@ -63,7 +81,7 @@ export default function LeadersPage() {
     <div className="relative flex min-h-screen flex-col justify-between text-white">
       <AlphaBackdrop />
 
-      <main className="relative z-10 mx-auto flex w-full max-w-5xl flex-1 flex-col items-center justify-center px-4 py-8 sm:py-12">
+      <main className="relative z-10 mx-auto flex w-full max-w-6xl flex-1 flex-col items-center justify-center px-4 py-8 sm:py-12">
         <div className="alpha-card-frame w-full">
           <div className="overflow-hidden rounded-[8px] bg-black/85 shadow-2xl backdrop-blur-md">
             <AlphaCardLogoBanner />
@@ -85,7 +103,7 @@ export default function LeadersPage() {
               </div>
 
               {/* Leadership Grid */}
-              <div className="mt-8 grid gap-4 sm:grid-cols-2">
+              <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
                 {leaders.map((leader) => (
                   <div
                     key={leader.name}
