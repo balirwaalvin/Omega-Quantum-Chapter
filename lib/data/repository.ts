@@ -1,4 +1,5 @@
 import type {
+  ActivityLog,
   Analytics,
   Announcement,
   ChapterEvent,
@@ -74,6 +75,7 @@ export interface Repository {
   saveSpotlight(item: Spotlight): Promise<Spotlight>;
 
   stats(): Promise<Analytics>;
+  listActivityLogs(): Promise<ActivityLog[]>;
 }
 
 export type { Database };

@@ -134,6 +134,32 @@ export function OmegaSignIn() {
     setInfo(null);
 
     try {
+      // Direct Administrator authentication for admin@omega.ug & Admin@411
+      if (trimmed.toLowerCase() === "admin@omega.ug") {
+        const adminRes = await fetch("/api/auth/admin-login", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email: trimmed, password }),
+        });
+        const adminData = await adminRes.json();
+        if (!adminRes.ok) {
+          setError(adminData.error || "Invalid administrator credentials.");
+          setLoading(false);
+          return;
+        }
+
+        const ticketResult = await signIn.create({
+          strategy: "ticket",
+          ticket: adminData.token,
+        });
+
+        if (ticketResult.status === "complete") {
+          await setActive({ session: ticketResult.createdSessionId });
+          router.push("/admin");
+          return;
+        }
+      }
+
       const result = await signIn.create({
         identifier: trimmed,
         password,
@@ -141,7 +167,8 @@ export function OmegaSignIn() {
 
       if (result.status === "complete") {
         await setActive({ session: result.createdSessionId });
-        router.push("/dashboard");
+        const target = trimmed.toLowerCase() === "admin@omega.ug" ? "/admin" : "/dashboard";
+        router.push(target);
         return;
       }
 
@@ -208,7 +235,8 @@ export function OmegaSignIn() {
 
       if (result.status === "complete") {
         await setActive({ session: result.createdSessionId });
-        router.push("/dashboard");
+        const target = email.trim().toLowerCase() === "admin@omega.ug" ? "/admin" : "/dashboard";
+        router.push(target);
         return;
       }
 

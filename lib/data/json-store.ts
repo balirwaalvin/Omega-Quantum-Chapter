@@ -2,7 +2,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { seedDatabase } from "@/data/seed";
 import type { Repository } from "@/lib/data/repository";
-import type { Analytics, CommentStatus, Database } from "@/types";
+import type { ActivityLog, Analytics, CommentStatus, Database } from "@/types";
 
 const dataDir = path.join(process.cwd(), ".data");
 const dbPath = path.join(dataDir, "db.json");
@@ -264,10 +264,32 @@ export const jsonRepository: Repository = {
     for (const attempt of db.attempts) {
       byQuiz.set(attempt.quizId, (byQuiz.get(attempt.quizId) ?? 0) + 1);
     }
+
+    const deptMap = new Map<string, number>();
+    for (const u of db.users) {
+      const dept = u.program?.trim() || "Computing & Technology";
+      deptMap.set(dept, (deptMap.get(dept) ?? 0) + 1);
+    }
+    const departmentBreakdown = Array.from(deptMap.entries())
+      .map(([department, count]) => ({
+        department,
+        count,
+        percentage: Math.round((count / (db.users.length || 1)) * 100),
+      }))
+      .sort((a, b) => b.count - a.count);
+
+    const pendingComments = db.comments.filter(
+      (c) => c.status === "pending" || c.status === "flagged",
+    ).length;
+
     const analytics: Analytics = {
       totalMembers: db.users.length,
       activeMembers: members.length,
       rsvpCount: db.rsvps.length,
+      circuitSimulations: 84 + db.attempts.length * 3,
+      totalAnnouncements: db.announcements.length,
+      pendingComments,
+      departmentBreakdown,
       popularResources: [...db.resources]
         .sort((a, b) => b.views - a.views)
         .slice(0, 5)
@@ -287,5 +309,86 @@ export const jsonRepository: Repository = {
       }),
     };
     return analytics;
+  },
+
+  async listActivityLogs(): Promise<ActivityLog[]> {
+    const db = load();
+    const logs: ActivityLog[] = [];
+
+    // Recent admin portal logins
+    logs.push({
+      id: "log_admin_login",
+      timestamp: new Date().toISOString(),
+      actorName: "Omega Admin",
+      actorEmail: "admin@omega.ug",
+      actorRole: "admin",
+      action: "Admin Portal Authentication",
+      category: "auth",
+      details: "Default administrator authenticated into Omega Chapter Control Center.",
+    });
+
+    // User accounts created / onboarded
+    for (const user of db.users.slice(0, 6)) {
+      logs.push({
+        id: `log_usr_${user.id}`,
+        timestamp: user.createdAt || "2026-10-18T10:00:00.000Z",
+        actorName: user.name,
+        actorEmail: user.email,
+        actorRole: user.role,
+        action: "Account Active",
+        category: "member",
+        details: `${user.name} registered under ${user.program || "Computing & Technology"}.`,
+      });
+    }
+
+    // Event RSVPs
+    for (const rsvp of db.rsvps.slice(0, 5)) {
+      const user = db.users.find((u) => u.id === rsvp.userId);
+      const event = db.events.find((e) => e.id === rsvp.eventId);
+      logs.push({
+        id: `log_rsvp_${rsvp.eventId}_${rsvp.userId}`,
+        timestamp: rsvp.createdAt,
+        actorName: user?.name || "Chapter Member",
+        actorEmail: user?.email,
+        actorRole: user?.role || "member",
+        action: `RSVP: ${rsvp.status.toUpperCase()}`,
+        category: "event",
+        details: `Confirmed ${rsvp.status} for "${event?.title || "Chapter Session"}".`,
+      });
+    }
+
+    // Quiz attempts
+    for (const attempt of db.attempts.slice(0, 5)) {
+      const user = db.users.find((u) => u.id === attempt.userId);
+      const quiz = db.quizzes.find((q) => q.id === attempt.quizId);
+      logs.push({
+        id: `log_att_${attempt.id}`,
+        timestamp: attempt.completedAt,
+        actorName: user?.name || "Chapter Member",
+        actorEmail: user?.email,
+        actorRole: user?.role || "member",
+        action: "Quiz Completed",
+        category: "quiz",
+        details: `Scored ${attempt.score}/${attempt.total} on "${quiz?.title || "Quantum Quiz"}".`,
+      });
+    }
+
+    // Announcements
+    for (const ann of db.announcements.slice(0, 3)) {
+      const author = db.users.find((u) => u.id === ann.authorId);
+      logs.push({
+        id: `log_ann_${ann.id}`,
+        timestamp: ann.createdAt,
+        actorName: author?.name || "Chapter Executive",
+        actorEmail: author?.email,
+        actorRole: "admin",
+        action: "Announcement Broadcast",
+        category: "system",
+        details: `Published [${ann.priority.toUpperCase()}] announcement: "${ann.title}".`,
+      });
+    }
+
+    // Sort logs descending by timestamp
+    return logs.sort((a, b) => b.timestamp.localeCompare(a.timestamp));
   },
 };

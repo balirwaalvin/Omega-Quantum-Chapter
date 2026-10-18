@@ -10,6 +10,7 @@ const isPublicRoute = createRouteMatcher([
   "/about",
   "/leaders(.*)",
   "/offline",
+  "/api/auth/admin-login",
   "/api/webhooks/clerk",
 ]);
 
@@ -25,7 +26,7 @@ export default clerkMiddleware(
       ? session.sessionClaims.email
       : undefined;
   let providers: string[] = [];
-  let role = parseRole(session.sessionClaims?.metadata?.role);
+  let role = parseRole(session.sessionClaims?.metadata?.role, email);
   let deactivated = session.sessionClaims?.metadata?.deactivated === true;
   const needsUser = !email || !session.sessionClaims?.metadata || !isAllowedEmail(email);
 
@@ -35,7 +36,7 @@ export default clerkMiddleware(
     email = email ?? user.primaryEmailAddress?.emailAddress ?? undefined;
     providers = user.externalAccounts.map((account) => account.provider);
     if (!session.sessionClaims?.metadata) {
-      role = parseRole(user.publicMetadata?.role);
+      role = parseRole(user.publicMetadata?.role, email);
       deactivated = user.publicMetadata?.deactivated === true || user.banned === true;
     }
   }

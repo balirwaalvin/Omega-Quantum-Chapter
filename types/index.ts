@@ -149,10 +149,25 @@ export type Database = {
   spotlights: Spotlight[];
 };
 
+export type ActivityLog = {
+  id: string;
+  timestamp: string;
+  actorName: string;
+  actorEmail?: string;
+  actorRole: Role;
+  action: string;
+  category: "auth" | "event" | "quiz" | "resource" | "member" | "moderation" | "system";
+  details: string;
+};
+
 export type Analytics = {
   totalMembers: number;
   activeMembers: number;
   rsvpCount: number;
+  circuitSimulations: number;
+  totalAnnouncements: number;
+  pendingComments: number;
+  departmentBreakdown: { department: string; count: number; percentage: number }[];
   popularResources: { id: string; title: string; views: number }[];
   quizCompletion: {
     quizId: string;

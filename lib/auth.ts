@@ -21,7 +21,7 @@ export async function getAppSession(): Promise<AppSession | null> {
       email,
     ),
     imageUrl: user.imageUrl ?? "",
-    role: parseRole(user.publicMetadata?.role),
+    role: parseRole(user.publicMetadata?.role, email),
     deactivated: user.publicMetadata?.deactivated === true || user.banned === true,
     providers,
   };

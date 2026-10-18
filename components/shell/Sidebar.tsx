@@ -36,11 +36,12 @@ const navSections = [
 
 const staffLinks = [
   { href: "/admin", label: "Overview" },
+  { href: "/admin/members", label: "Members" },
+  { href: "/admin/activity", label: "Activity Logs" },
   { href: "/admin/events", label: "Events" },
   { href: "/admin/announcements", label: "Announcements" },
   { href: "/admin/resources", label: "Resources" },
   { href: "/admin/quizzes", label: "Quizzes" },
-  { href: "/admin/members", label: "Members" },
   { href: "/admin/moderation", label: "Moderation" },
 ];
 

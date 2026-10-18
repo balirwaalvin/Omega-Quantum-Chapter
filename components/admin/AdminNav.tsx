@@ -5,11 +5,12 @@ import { usePathname } from "next/navigation";
 
 const links = [
   ["/admin", "Overview"],
+  ["/admin/members", "Members"],
+  ["/admin/activity", "Activity Logs"],
   ["/admin/events", "Events"],
   ["/admin/announcements", "Announcements"],
   ["/admin/resources", "Resources"],
   ["/admin/quizzes", "Quizzes"],
-  ["/admin/members", "Members"],
   ["/admin/moderation", "Moderation"],
 ] as const;
 
