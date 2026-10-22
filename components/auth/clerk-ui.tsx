@@ -4,6 +4,7 @@ import { useState, type FormEvent } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useSignIn, useSignUp } from "@clerk/nextjs/legacy";
+import { useUser, useClerk } from "@clerk/nextjs";
 
 export const omegaAppearance = {
   variables: {
@@ -38,7 +39,10 @@ function getClerkErrorMessage(err: unknown, fallback: string): string {
 export function OmegaSignIn() {
   const router = useRouter();
   const { isLoaded, signIn, setActive } = useSignIn();
+  const { isLoaded: isUserLoaded, isSignedIn, user } = useUser();
+  const { signOut } = useClerk();
 
+  const [signingOut, setSigningOut] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -61,7 +65,29 @@ export function OmegaSignIn() {
         redirectUrl: "/sso-callback",
         redirectUrlComplete: "/dashboard",
       });
-    } catch (err) {
+    } catch (err: unknown) {
+      const errObj = err as { errors?: Array<{ code?: string; message?: string }> } | null;
+      const isAlreadySignedIn =
+        errObj?.errors?.some(
+          (e) =>
+            e.code === "session_exists" ||
+            e.message?.toLowerCase().includes("already signed in"),
+        ) || (err instanceof Error && err.message.toLowerCase().includes("already signed in"));
+
+      if (isAlreadySignedIn) {
+        try {
+          await signOut();
+          await signIn.authenticateWithRedirect({
+            strategy,
+            redirectUrl: "/sso-callback",
+            redirectUrlComplete: "/dashboard",
+          });
+          return;
+        } catch {
+          // fallback to error display
+        }
+      }
+
       if (strategy === "oauth_linkedin_oidc") {
         try {
           await signIn.authenticateWithRedirect({
@@ -148,15 +174,49 @@ export function OmegaSignIn() {
           return;
         }
 
-        const ticketResult = await signIn.create({
-          strategy: "ticket",
-          ticket: adminData.token,
-        });
+        try {
+          const ticketResult = await signIn.create({
+            strategy: "ticket",
+            ticket: adminData.token,
+          });
 
-        if (ticketResult.status === "complete") {
-          await setActive({ session: ticketResult.createdSessionId });
-          router.push("/admin");
-          return;
+          if (ticketResult.status === "complete") {
+            await setActive({ session: ticketResult.createdSessionId });
+            router.push("/admin");
+            return;
+          }
+        } catch (ticketErr: unknown) {
+          const errObj = ticketErr as { errors?: Array<{ code?: string; message?: string }> } | null;
+          const isSessionExists =
+            errObj?.errors?.some(
+              (e) =>
+                e.code === "session_exists" ||
+                e.message?.toLowerCase().includes("already signed in"),
+            ) ||
+            (ticketErr instanceof Error &&
+              ticketErr.message.toLowerCase().includes("already signed in"));
+
+          if (isSessionExists) {
+            await signOut();
+            const retryRes = await fetch("/api/auth/admin-login", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ email: trimmed, password }),
+            });
+            const retryData = await retryRes.json();
+            if (retryRes.ok && retryData.token) {
+              const retryTicket = await signIn.create({
+                strategy: "ticket",
+                ticket: retryData.token,
+              });
+              if (retryTicket.status === "complete") {
+                await setActive({ session: retryTicket.createdSessionId });
+                router.push("/admin");
+                return;
+              }
+            }
+          }
+          throw ticketErr;
         }
       }
 
@@ -202,7 +262,39 @@ export function OmegaSignIn() {
       }
 
       setError("Additional verification is required to complete sign-in.");
-    } catch (err) {
+    } catch (err: unknown) {
+      const errObj = err as { errors?: Array<{ code?: string; message?: string }> } | null;
+      const isAlreadySignedIn =
+        errObj?.errors?.some(
+          (e) =>
+            e.code === "session_exists" ||
+            e.message?.toLowerCase().includes("already signed in"),
+        ) ||
+        (err instanceof Error &&
+          err.message.toLowerCase().includes("already signed in"));
+
+      if (isAlreadySignedIn) {
+        try {
+          await signOut();
+          const retryResult = await signIn.create({
+            identifier: trimmed,
+            password,
+          });
+          if (retryResult.status === "complete") {
+            await setActive({ session: retryResult.createdSessionId });
+            const target =
+              trimmed.toLowerCase() === "admin@omega.ug"
+                ? "/admin"
+                : "/dashboard";
+            router.push(target);
+            return;
+          }
+        } catch {
+          setError("You're already signed in with an active session.");
+          return;
+        }
+      }
+
       setError(getClerkErrorMessage(err, "Invalid email or password."));
     } finally {
       setLoading(false);
@@ -248,6 +340,57 @@ export function OmegaSignIn() {
     }
   }
 
+  if (isUserLoaded && isSignedIn && user) {
+    const userEmail =
+      user.primaryEmailAddress?.emailAddress ??
+      user.username ??
+      "your account";
+    const isAdmin =
+      userEmail.toLowerCase() === "admin@omega.ug" ||
+      user.publicMetadata?.role === "admin";
+
+    return (
+      <div className="w-full text-center space-y-4">
+        <div className="rounded-[6px] border border-[#2767b9]/40 bg-[#001738]/80 p-4 text-left shadow-inner">
+          <p className="text-[11px] font-semibold uppercase tracking-wider text-slate-300">
+            Currently Signed In
+          </p>
+          <p className="mt-1 font-bold text-white text-sm truncate">{userEmail}</p>
+          {user.fullName && (
+            <p className="text-xs text-slate-300 mt-0.5">{user.fullName}</p>
+          )}
+        </div>
+
+        <div className="space-y-2.5">
+          <button
+            type="button"
+            onClick={() => router.push(isAdmin ? "/admin" : "/dashboard")}
+            className="w-full rounded-[6px] bg-[#2767b9] px-4 py-2.5 text-xs font-bold uppercase tracking-wider text-white shadow-xs transition hover:bg-[#1f569d]"
+          >
+            Continue to {isAdmin ? "Admin Panel" : "Dashboard"} &rarr;
+          </button>
+
+          <button
+            type="button"
+            disabled={signingOut}
+            onClick={async () => {
+              setSigningOut(true);
+              try {
+                await signOut();
+                router.refresh();
+              } finally {
+                setSigningOut(false);
+              }
+            }}
+            className="w-full rounded-[6px] border border-slate-400/40 bg-white/5 px-4 py-2 text-xs font-semibold text-slate-200 transition hover:bg-white/10 hover:text-white disabled:opacity-50"
+          >
+            {signingOut ? "Signing out..." : "Sign out & Switch Account"}
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="w-full text-left">
       {error ? (
@@ -255,7 +398,29 @@ export function OmegaSignIn() {
           role="alert"
           className="mb-3 rounded-[5px] border border-[#b5004f]/60 bg-[#b5004f]/20 px-3 py-2 text-center text-xs font-medium text-pink-100"
         >
-          {error}
+          <p>{error}</p>
+          {error.toLowerCase().includes("already signed in") && (
+            <div className="mt-2.5 flex items-center justify-center gap-2">
+              <button
+                type="button"
+                onClick={() => router.push("/dashboard")}
+                className="rounded-[4px] bg-[#2767b9] px-2.5 py-1 text-[11px] font-bold text-white transition hover:bg-[#1f569d]"
+              >
+                Go to Dashboard
+              </button>
+              <button
+                type="button"
+                onClick={async () => {
+                  await signOut();
+                  setError(null);
+                  router.refresh();
+                }}
+                className="rounded-[4px] border border-pink-300/40 bg-white/10 px-2.5 py-1 text-[11px] font-semibold text-white transition hover:bg-white/20"
+              >
+                Sign out
+              </button>
+            </div>
+          )}
         </div>
       ) : null}
 
@@ -481,7 +646,10 @@ export function OmegaSignIn() {
 export function OmegaSignUp() {
   const router = useRouter();
   const { isLoaded, signUp, setActive } = useSignUp();
+  const { isLoaded: isUserLoaded, isSignedIn, user } = useUser();
+  const { signOut } = useClerk();
 
+  const [signingOut, setSigningOut] = useState(false);
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
@@ -503,7 +671,29 @@ export function OmegaSignUp() {
         redirectUrl: "/sso-callback",
         redirectUrlComplete: "/dashboard",
       });
-    } catch (err) {
+    } catch (err: unknown) {
+      const errObj = err as { errors?: Array<{ code?: string; message?: string }> } | null;
+      const isAlreadySignedIn =
+        errObj?.errors?.some(
+          (e) =>
+            e.code === "session_exists" ||
+            e.message?.toLowerCase().includes("already signed in"),
+        ) || (err instanceof Error && err.message.toLowerCase().includes("already signed in"));
+
+      if (isAlreadySignedIn) {
+        try {
+          await signOut();
+          await signUp.authenticateWithRedirect({
+            strategy,
+            redirectUrl: "/sso-callback",
+            redirectUrlComplete: "/dashboard",
+          });
+          return;
+        } catch {
+          // fallback
+        }
+      }
+
       if (strategy === "oauth_linkedin_oidc") {
         try {
           await signUp.authenticateWithRedirect({
@@ -546,7 +736,40 @@ export function OmegaSignUp() {
 
       await signUp.prepareEmailAddressVerification({ strategy: "email_code" });
       setStep("verify");
-    } catch (err) {
+    } catch (err: unknown) {
+      const errObj = err as { errors?: Array<{ code?: string; message?: string }> } | null;
+      const isAlreadySignedIn =
+        errObj?.errors?.some(
+          (e) =>
+            e.code === "session_exists" ||
+            e.message?.toLowerCase().includes("already signed in"),
+        ) ||
+        (err instanceof Error &&
+          err.message.toLowerCase().includes("already signed in"));
+
+      if (isAlreadySignedIn) {
+        try {
+          await signOut();
+          const retryResult = await signUp.create({
+            firstName: firstName.trim() || undefined,
+            lastName: lastName.trim() || undefined,
+            emailAddress: email.trim(),
+            password,
+          });
+          if (retryResult.status === "complete") {
+            await setActive({ session: retryResult.createdSessionId });
+            router.push("/dashboard");
+            return;
+          }
+          await signUp.prepareEmailAddressVerification({ strategy: "email_code" });
+          setStep("verify");
+          return;
+        } catch {
+          setError("You're already signed in with an active session.");
+          return;
+        }
+      }
+
       setError(getClerkErrorMessage(err, "Unable to create account."));
     } finally {
       setLoading(false);
@@ -579,6 +802,57 @@ export function OmegaSignUp() {
     }
   }
 
+  if (isUserLoaded && isSignedIn && user) {
+    const userEmail =
+      user.primaryEmailAddress?.emailAddress ??
+      user.username ??
+      "your account";
+    const isAdmin =
+      userEmail.toLowerCase() === "admin@omega.ug" ||
+      user.publicMetadata?.role === "admin";
+
+    return (
+      <div className="w-full text-center space-y-4">
+        <div className="rounded-[6px] border border-[#2767b9]/40 bg-[#001738]/80 p-4 text-left shadow-inner">
+          <p className="text-[11px] font-semibold uppercase tracking-wider text-slate-300">
+            Currently Signed In
+          </p>
+          <p className="mt-1 font-bold text-white text-sm truncate">{userEmail}</p>
+          {user.fullName && (
+            <p className="text-xs text-slate-300 mt-0.5">{user.fullName}</p>
+          )}
+        </div>
+
+        <div className="space-y-2.5">
+          <button
+            type="button"
+            onClick={() => router.push(isAdmin ? "/admin" : "/dashboard")}
+            className="w-full rounded-[6px] bg-[#2767b9] px-4 py-2.5 text-xs font-bold uppercase tracking-wider text-white shadow-xs transition hover:bg-[#1f569d]"
+          >
+            Continue to {isAdmin ? "Admin Panel" : "Dashboard"} &rarr;
+          </button>
+
+          <button
+            type="button"
+            disabled={signingOut}
+            onClick={async () => {
+              setSigningOut(true);
+              try {
+                await signOut();
+                router.refresh();
+              } finally {
+                setSigningOut(false);
+              }
+            }}
+            className="w-full rounded-[6px] border border-slate-400/40 bg-white/5 px-4 py-2 text-xs font-semibold text-slate-200 transition hover:bg-white/10 hover:text-white disabled:opacity-50"
+          >
+            {signingOut ? "Signing out..." : "Sign out & Create New Account"}
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="w-full text-left">
       {error ? (
@@ -586,7 +860,29 @@ export function OmegaSignUp() {
           role="alert"
           className="mb-3 rounded-[5px] border border-[#b5004f]/60 bg-[#b5004f]/20 px-3 py-2 text-center text-xs font-medium text-pink-100"
         >
-          {error}
+          <p>{error}</p>
+          {error.toLowerCase().includes("already signed in") && (
+            <div className="mt-2.5 flex items-center justify-center gap-2">
+              <button
+                type="button"
+                onClick={() => router.push("/dashboard")}
+                className="rounded-[4px] bg-[#2767b9] px-2.5 py-1 text-[11px] font-bold text-white transition hover:bg-[#1f569d]"
+              >
+                Go to Dashboard
+              </button>
+              <button
+                type="button"
+                onClick={async () => {
+                  await signOut();
+                  setError(null);
+                  router.refresh();
+                }}
+                className="rounded-[4px] border border-pink-300/40 bg-white/10 px-2.5 py-1 text-[11px] font-semibold text-white transition hover:bg-white/20"
+              >
+                Sign out
+              </button>
+            </div>
+          )}
         </div>
       ) : null}
 

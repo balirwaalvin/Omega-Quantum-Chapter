@@ -10,6 +10,8 @@ Omega is the Progressive Web App for the Quantum Computing Chapter at Uganda Chr
 - `quantum-circuit` for the playground and algorithm explainers
 - Three.js (`@react-three/fiber`) for the Bloch sphere
 - Serwist for the service worker
+- JSON seed data in development, with a Supabase-shaped adapter stud
+- Clerk for sign-in, sign-up, and email verification
 
 ## Setup
 
@@ -19,7 +21,7 @@ cp .env.example .env.local
 npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000).
+Open [http://localhost:3001](http://localhost:3001).
 
 ### Clerk
 
