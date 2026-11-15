@@ -27,25 +27,26 @@ export function Header({
           >
             Menu
           </button>
-          <Link href="/dashboard" className="inline-flex items-center">
-            <OmegaLockup size="sm" theme="light" />
-          </Link>
-          <div className="hidden items-center gap-3 lg:flex">
-            <span className="h-6 w-px bg-slate-200" aria-hidden />
+          <Link
+            href="/dashboard"
+            className="inline-flex items-center gap-2.5 sm:gap-3"
+          >
+            <OmegaLockup size="sm" theme="light" showSubtitle={false} />
+            <span className="h-5 w-px bg-slate-200 sm:h-6" aria-hidden />
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src="/brand/ucu.png"
               alt="Uganda Christian University"
-              className="h-7 w-auto object-contain select-none"
+              className="h-6 w-auto object-contain select-none sm:h-7"
             />
-            <span className="h-6 w-px bg-slate-200" aria-hidden />
+            <span className="h-5 w-px bg-slate-200 sm:h-6" aria-hidden />
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
-              src="/brand/chapter.png"
+              src="/brand/qcc-logo-transparent.png"
               alt="Quantum Computing UCU Chapter"
-              className="h-9 w-auto object-contain select-none"
+              className="h-7 w-auto object-contain select-none sm:h-8"
             />
-          </div>
+          </Link>
         </div>
 
         <div className="flex items-center gap-2.5">
