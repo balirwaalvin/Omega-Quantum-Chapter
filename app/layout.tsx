@@ -43,7 +43,11 @@ export default function RootLayout({ children }: { children: ReactNode }) {
 
   if (!publishableKey) {
     return (
-      <html lang="en" className={`${inter.variable} h-full`}>
+      <html
+        lang="en"
+        data-scroll-behavior="smooth"
+        className={`${inter.variable} h-full`}
+      >
         <body className="min-h-full bg-background p-8 text-ink">
           <main className="mx-auto max-w-lg">
             <h1 className="text-3xl font-semibold text-ucu-blue">Omega</h1>
@@ -59,7 +63,11 @@ export default function RootLayout({ children }: { children: ReactNode }) {
   }
 
   return (
-    <html lang="en" className={`${inter.variable} h-full`}>
+    <html
+      lang="en"
+      data-scroll-behavior="smooth"
+      className={`${inter.variable} h-full`}
+    >
       <body className="min-h-full bg-background text-ink antialiased">
         <ClerkProvider appearance={omegaAppearance} publishableKey={publishableKey}>
           {children}
