@@ -3,19 +3,34 @@
 import { useMemo, useState } from "react";
 import {
   basisLabel,
-  simulateCircuit,
+  circuitToOpenQasm,
+  circuitToQiskit,
+  simulateCircuitDetailed,
   type CircuitGrid,
   type GateName,
   type PlacedGate,
+  type QubitReadout,
 } from "@/lib/quantum/simulate";
 
-const tools: Array<GateName | "E"> = ["H", "X", "Y", "Z", "CNOT", "M", "E"];
+const tools: Array<GateName | "E"> = [
+  "H",
+  "X",
+  "Y",
+  "Z",
+  "S",
+  "T",
+  "CNOT",
+  "M",
+  "E",
+];
 
 const gateColors: Record<GateName, string> = {
   H: "border-ucu-blue bg-ucu-blue text-white shadow-xs",
   X: "border-forest bg-forest text-white shadow-xs",
   Y: "border-forest bg-forest text-white shadow-xs",
   Z: "border-forest bg-forest text-white shadow-xs",
+  S: "border-alpha-blue bg-alpha-blue text-white shadow-xs",
+  T: "border-alpha-blue bg-alpha-blue text-white shadow-xs",
   CNOT: "border-gold bg-gold text-ucu-blue shadow-xs",
   M: "border-magenta bg-magenta text-white shadow-xs",
 };
@@ -52,6 +67,11 @@ export function CircuitPlayground({
   const [tool, setTool] = useState<GateName | "E">("H");
   const [control, setControl] = useState(0);
   const [probabilities, setProbabilities] = useState<number[] | null>(null);
+  const [qubitReadouts, setQubitReadouts] = useState<QubitReadout[] | null>(
+    null,
+  );
+  const [codeTab, setCodeTab] = useState<"none" | "qiskit" | "qasm">("none");
+  const [copied, setCopied] = useState(false);
   const [error, setError] = useState("");
   const [running, setRunning] = useState(false);
 
@@ -59,6 +79,12 @@ export function CircuitPlayground({
     () => Array.from({ length: qubits }, (_, index) => `q${index}`),
     [qubits],
   );
+
+  const exportedCode = useMemo(() => {
+    if (codeTab === "qiskit") return circuitToQiskit(qubits, grid);
+    if (codeTab === "qasm") return circuitToOpenQasm(qubits, grid);
+    return "";
+  }, [codeTab, qubits, grid]);
 
   function place(columnIndex: number, wire: number) {
     if (readOnly) return;
@@ -79,17 +105,37 @@ export function CircuitPlayground({
       }),
     );
     setProbabilities(null);
+    setQubitReadouts(null);
+  }
+
+  function clearCircuit() {
+    setGrid(emptyGrid(width, qubits));
+    setProbabilities(null);
+    setQubitReadouts(null);
   }
 
   async function run() {
     setRunning(true);
     setError("");
     try {
-      setProbabilities(await simulateCircuit(qubits, grid));
+      const result = await simulateCircuitDetailed(qubits, grid);
+      setProbabilities(result.probabilities);
+      setQubitReadouts(result.qubits);
     } catch (cause) {
       setError(cause instanceof Error ? cause.message : "Simulation failed.");
     } finally {
       setRunning(false);
+    }
+  }
+
+  async function copyCode() {
+    if (!exportedCode) return;
+    try {
+      await navigator.clipboard.writeText(exportedCode);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 1800);
+    } catch {
+      // Clipboard fallback ignored
     }
   }
 
@@ -102,10 +148,47 @@ export function CircuitPlayground({
         <h2 id="circuit-heading" className="text-lg font-semibold text-ucu-blue">
           {title}
         </h2>
-        <button type="button" className="btn" onClick={run} disabled={running}>
-          {running ? "Running…" : "Run simulation"}
-        </button>
+        <div className="flex flex-wrap items-center gap-2">
+          <button
+            type="button"
+            className={
+              codeTab === "qiskit" ? "btn-gold text-xs" : "btn-secondary text-xs"
+            }
+            onClick={() =>
+              setCodeTab((t) => (t === "qiskit" ? "none" : "qiskit"))
+            }
+          >
+            {codeTab === "qiskit" ? "Hide Qiskit" : "Export Qiskit (Python)"}
+          </button>
+          <button
+            type="button"
+            className={
+              codeTab === "qasm" ? "btn-gold text-xs" : "btn-secondary text-xs"
+            }
+            onClick={() => setCodeTab((t) => (t === "qasm" ? "none" : "qasm"))}
+          >
+            {codeTab === "qasm" ? "Hide OpenQASM" : "Export OpenQASM 2.0"}
+          </button>
+          {!readOnly ? (
+            <button
+              type="button"
+              className="btn-secondary text-xs"
+              onClick={clearCircuit}
+            >
+              Clear
+            </button>
+          ) : null}
+          <button
+            type="button"
+            className="btn"
+            onClick={run}
+            disabled={running}
+          >
+            {running ? "Running…" : "Run simulation"}
+          </button>
+        </div>
       </div>
+
       {readOnly ? null : (
         <div
           className="mt-3 flex flex-wrap items-center gap-2"
@@ -142,6 +225,8 @@ export function CircuitPlayground({
           ) : null}
         </div>
       )}
+
+      {/* Circuit Wire Grid */}
       <div className="mt-5 overflow-x-auto rounded-xl border border-slate-100 bg-slate-50/70 p-4">
         <div
           className="inline-grid items-center gap-y-3 gap-x-2"
@@ -168,10 +253,80 @@ export function CircuitPlayground({
           ))}
         </div>
       </div>
+
+      {/* Live Qiskit / OpenQASM 2.0 Code Export Panel */}
+      {codeTab !== "none" ? (
+        <div className="mt-4 overflow-hidden rounded-xl border border-slate-800 bg-slate-950 text-slate-100">
+          <div className="flex items-center justify-between border-b border-slate-800 bg-slate-900 px-4 py-2">
+            <span className="font-mono text-xs font-semibold text-[#7fb3ff]">
+              {codeTab === "qiskit"
+                ? "circuit.py — Qiskit 1.x"
+                : "circuit.qasm — OpenQASM 2.0"}
+            </span>
+            <button
+              type="button"
+              onClick={copyCode}
+              className="rounded-md bg-[#2767b9] px-2.5 py-1 text-[11px] font-semibold text-white transition hover:bg-[#1f569d]"
+            >
+              {copied ? "Copied ✓" : "Copy Code"}
+            </button>
+          </div>
+          <pre className="overflow-x-auto p-4 font-mono text-xs leading-relaxed text-slate-200">
+            <code>{exportedCode}</code>
+          </pre>
+        </div>
+      ) : null}
+
       {error ? <p className="mt-3 text-sm text-magenta">{error}</p> : null}
+
+      {/* Per-Qubit Reduced Bloch State & Entanglement Telemetry */}
+      {qubitReadouts ? (
+        <div className="mt-4">
+          <h3 className="text-xs font-bold uppercase tracking-wider text-alpha-blue">
+            Per-Qubit Reduced State &amp; Entanglement Witness
+          </h3>
+          <div className="mt-2 grid gap-2.5 sm:grid-cols-3">
+            {qubitReadouts.map((q) => (
+              <div
+                key={q.wire}
+                className="rounded-xl border border-slate-200 bg-slate-50/70 p-3 text-xs"
+              >
+                <div className="flex items-center justify-between">
+                  <span className="font-mono font-bold text-ucu-blue">
+                    |q{q.wire}⟩
+                  </span>
+                  <span
+                    className={`rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider ${
+                      q.entangled
+                        ? "bg-magenta/10 text-magenta"
+                        : "bg-emerald-50 text-emerald-700"
+                    }`}
+                  >
+                    {q.entangled ? "Entangled" : "Separable (Pure)"}
+                  </span>
+                </div>
+                <p className="mt-1.5 font-mono text-[11px] text-ink">
+                  Bloch: ({q.x.toFixed(2)}, {q.y.toFixed(2)}, {q.z.toFixed(2)})
+                </p>
+                <p className="mt-0.5 text-[11px] text-muted">
+                  Purity γ = Tr(ρ²):{" "}
+                  <strong className="font-mono text-ink">
+                    {q.purity.toFixed(2)}
+                  </strong>{" "}
+                  &middot; P(|1⟩) = {(q.p1 * 100).toFixed(0)}%
+                </p>
+              </div>
+            ))}
+          </div>
+        </div>
+      ) : null}
+
+      {/* Computational Basis Probabilities */}
       {probabilities ? (
         <div className="mt-4">
-          <h3 className="text-sm font-semibold text-ucu-blue">Probabilities</h3>
+          <h3 className="text-xs font-bold uppercase tracking-wider text-ucu-blue">
+            Computational Basis Probabilities
+          </h3>
           <ul className="mt-2 grid gap-2">
             {probabilities.map((value, index) => (
               <li
@@ -196,11 +351,14 @@ export function CircuitPlayground({
         </div>
       ) : (
         <p className="mt-3 text-sm text-muted">
-          Run the circuit to see measurement probabilities.
+          Run the circuit to see measurement probabilities and per-qubit
+          entanglement purity.
         </p>
       )}
       <p className="mt-3 text-xs text-muted">
-        Bit strings follow quantum-circuit. The rightmost bit is q0.
+        Bit strings follow quantum-circuit. The rightmost bit is q0. Purity γ =
+        1.00 indicates a separable pure state; γ = 0.50 indicates a maximally
+        entangled qubit.
       </p>
     </section>
   );
