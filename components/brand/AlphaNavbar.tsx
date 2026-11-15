@@ -1,8 +1,8 @@
 "use client";
 
 import Link from "next/link";
-
 import type { ReactNode } from "react";
+import { OmegaLockup } from "@/components/brand/Logo";
 
 interface NavItem {
   name: string;
@@ -53,28 +53,41 @@ export function AlphaNavbar({
 
   return (
     <footer className="relative w-full">
-
       <div
-        className={`mx-auto flex w-full max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8 ${
+        className={`mx-auto flex w-full max-w-7xl flex-wrap items-center justify-between gap-3 px-4 sm:px-6 lg:px-8 ${
           isBottom ? "py-4 pb-6 sm:py-5" : "pt-5 pb-3 sm:pt-6"
         }`}
       >
-        {/* Brand title: text only, no logo graphic, reference https://alpha.ucu.ac.ug */}
-        <div className="flex flex-col items-start pr-2">
+        {/* Menu bar brand cluster: Omega text wordmark + UCU logo + Chapter logo */}
+        <div className="flex flex-wrap items-center gap-2.5 pr-2 sm:gap-3.5">
           <Link
             href="/"
-            className="group inline-flex flex-wrap items-baseline text-white transition-opacity hover:opacity-95"
+            className="group inline-flex items-center transition-opacity hover:opacity-95"
           >
-            <span className="text-sm font-bold uppercase tracking-wider text-white sm:text-base">
-              OMEGA
-            </span>
-            <span className="ml-1.5 text-xs font-normal text-white/90 sm:text-sm">
-              Quantum Computing Chapter
-            </span>
+            <OmegaLockup size="sm" theme="dark" showSubtitle={false} />
           </Link>
-          <p className="mt-0.5 text-[11px] text-white/70">
-            Department Of Computing &amp; Technology
-          </p>
+
+          <span className="h-5 w-px bg-white/25 sm:h-6" aria-hidden />
+
+          <span className="inline-flex items-center rounded-md bg-white/95 px-2 py-1 shadow-xs">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="/brand/ucu.png"
+              alt="Uganda Christian University"
+              className="h-5 w-auto object-contain select-none sm:h-6"
+            />
+          </span>
+
+          <span className="h-5 w-px bg-white/25 sm:h-6" aria-hidden />
+
+          <span className="inline-flex items-center rounded-md bg-white/95 px-2 py-0.5 shadow-xs">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="/brand/qcc-logo-transparent.png"
+              alt="Quantum Computing Chapter"
+              className="h-6 w-auto object-contain select-none sm:h-7"
+            />
+          </span>
         </div>
 
         {/* Navigation with icons */}
