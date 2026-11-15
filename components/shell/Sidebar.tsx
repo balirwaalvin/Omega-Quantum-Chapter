@@ -29,6 +29,7 @@ const navSections = [
     heading: "Account",
     links: [
       { href: "/profile", label: "Profile" },
+      { href: "/leaders", label: "Leaders" },
       { href: "/about", label: "About" },
     ],
   },
@@ -136,7 +137,7 @@ export function Sidebar({
           <span className="h-5 w-px bg-slate-300" aria-hidden />
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
-            src="/brand/chapter.png"
+            src="/brand/qcc-logo-transparent.png"
             alt="Quantum Computing Chapter"
             className="h-8 w-auto object-contain select-none"
           />
