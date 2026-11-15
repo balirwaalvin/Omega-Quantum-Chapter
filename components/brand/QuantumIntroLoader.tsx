@@ -294,6 +294,7 @@ export function QuantumIntroLoader({ onComplete }: QuantumIntroLoaderProps) {
                 src="/brand/qcc-logo-transparent.png"
                 alt="Quantum Computing Chapter UCU"
                 fill
+                sizes="(max-width: 640px) 144px, 176px"
                 priority
                 className="object-contain drop-shadow-xs"
               />
