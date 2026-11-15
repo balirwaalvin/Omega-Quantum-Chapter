@@ -119,11 +119,22 @@ export type Comment = {
 
 export type ProjectStatus = "idea" | "active" | "done";
 
+export type CircuitPresetId =
+  | "bell"
+  | "ghz"
+  | "superposition"
+  | "deutsch-jozsa"
+  | "grover";
+
 export type Project = {
   id: string;
   title: string;
+  summary?: string;
   body: string;
   status: ProjectStatus;
+  tags?: string[];
+  repoUrl?: string;
+  circuitPreset?: CircuitPresetId;
   memberIds: string[];
   updatedAt: string;
 };
