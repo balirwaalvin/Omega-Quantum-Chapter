@@ -92,7 +92,7 @@ export function InstitutionalLockupCard({
             <div className="h-12 w-px bg-slate-200" />
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
-              src="/brand/chapter.png"
+              src="/brand/qcc-logo-transparent.png"
               alt="Quantum Computing — UCU Chapter"
               className="h-16 w-auto object-contain sm:h-18"
             />
@@ -138,7 +138,7 @@ export function PartnerLogosRow({
       <span className={`${dividerHeight} w-px bg-slate-200`} aria-hidden />
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
-        src="/brand/chapter.png"
+        src="/brand/qcc-logo-transparent.png"
         alt="Quantum Computing — UCU Chapter"
         className={`${badgeHeight} w-auto object-contain`}
       />
