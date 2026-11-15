@@ -5,7 +5,12 @@ import { redirect } from "next/navigation";
 import { requireUser } from "@/lib/auth";
 import { getRepository } from "@/lib/data";
 import { scheduleEventReminder } from "@/lib/notifications";
-import type { CommentTarget, Project, ProjectStatus } from "@/types";
+import type {
+  CircuitPresetId,
+  CommentTarget,
+  Project,
+  ProjectStatus,
+} from "@/types";
 
 function newId(prefix: string) {
   return `${prefix}_${crypto.randomUUID().slice(0, 8)}`;
@@ -58,19 +63,42 @@ export async function addComment(formData: FormData) {
   if (targetType === "project") revalidatePath(`/projects/${targetId}`);
 }
 
+const VALID_PRESETS = new Set<CircuitPresetId>([
+  "bell",
+  "ghz",
+  "superposition",
+  "deutsch-jozsa",
+  "grover",
+]);
+
 export async function saveProject(formData: FormData) {
   const session = await requireUser();
   const repo = getRepository();
   const existingId = String(formData.get("id") || "");
   const previous = existingId ? await repo.getProject(existingId) : null;
   const status = String(formData.get("status") || "idea") as ProjectStatus;
+  const rawPreset = String(formData.get("circuitPreset") || "").trim();
+  const circuitPreset = VALID_PRESETS.has(rawPreset as CircuitPresetId)
+    ? (rawPreset as CircuitPresetId)
+    : undefined;
+  const tags = String(formData.get("tags") || "")
+    .split(",")
+    .map((item) => item.trim())
+    .filter(Boolean);
+  const summary = String(formData.get("summary") || "").trim();
+  const repoUrl = String(formData.get("repoUrl") || "").trim();
+
   const memberIds = new Set(previous?.memberIds ?? []);
   memberIds.add(session.userId);
   const project: Project = {
     id: existingId || newId("proj"),
     title: String(formData.get("title") || "").trim(),
+    summary: summary || undefined,
     body: String(formData.get("body") || "").trim(),
     status: status === "active" || status === "done" ? status : "idea",
+    tags: tags.length > 0 ? tags : previous?.tags,
+    repoUrl: repoUrl || undefined,
+    circuitPreset,
     memberIds: [...memberIds],
     updatedAt: new Date().toISOString(),
   };
@@ -79,6 +107,30 @@ export async function saveProject(formData: FormData) {
   revalidatePath("/projects");
   revalidatePath(`/projects/${project.id}`);
   if (!existingId) redirect(`/projects/${project.id}`);
+}
+
+export async function toggleProjectMembership(formData: FormData) {
+  const session = await requireUser();
+  const projectId = String(formData.get("projectId") || "");
+  if (!projectId) return;
+  const repo = getRepository();
+  const project = await repo.getProject(projectId);
+  if (!project) return;
+
+  const members = new Set(project.memberIds);
+  if (members.has(session.userId)) {
+    members.delete(session.userId);
+  } else {
+    members.add(session.userId);
+  }
+
+  await repo.saveProject({
+    ...project,
+    memberIds: [...members],
+    updatedAt: new Date().toISOString(),
+  });
+  revalidatePath("/projects");
+  revalidatePath(`/projects/${projectId}`);
 }
 
 export async function updateChapterProfile(formData: FormData) {
