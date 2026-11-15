@@ -17,10 +17,28 @@ function load(): Database {
   const g = globalThis as StoreGlobal;
   if (g.__omegaDb) return g.__omegaDb;
 
-  let db = cloneSeed();
+  const seed = cloneSeed();
+  let db = seed;
   try {
     if (fs.existsSync(dbPath)) {
-      db = JSON.parse(fs.readFileSync(dbPath, "utf8")) as Database;
+      const parsed = JSON.parse(fs.readFileSync(dbPath, "utf8")) as Database;
+      const seedProjectsById = new Map(
+        seed.projects.map((proj) => [proj.id, proj]),
+      );
+      const mergedProjects = (parsed.projects ?? seed.projects).map((proj) => {
+        const seedMatch = seedProjectsById.get(proj.id);
+        return seedMatch ? { ...seedMatch, ...proj } : proj;
+      });
+      for (const seedProj of seed.projects) {
+        if (!mergedProjects.some((p) => p.id === seedProj.id)) {
+          mergedProjects.push(seedProj);
+        }
+      }
+      db = {
+        ...seed,
+        ...parsed,
+        projects: mergedProjects,
+      };
     }
   } catch {
     db = cloneSeed();
