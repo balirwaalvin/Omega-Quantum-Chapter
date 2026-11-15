@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { AlphaBackdrop } from "@/components/brand/AlphaBackdrop";
 import { AlphaNavbar } from "@/components/brand/AlphaNavbar";
+import { OmegaLockup } from "@/components/brand/Logo";
 import { AlphaCardLogoBanner } from "@/components/brand/PartnerMark";
 
 export const metadata: Metadata = { title: "About" };
@@ -22,7 +23,7 @@ const institutions = [
   {
     name: "UCU Quantum Chapter",
     tag: "Student Community",
-    logo: "/brand/chapter.png",
+    logo: "/brand/qcc-logo-transparent.png",
     logoClass: "h-14",
   },
 ];
@@ -38,8 +39,9 @@ export default function AboutPage() {
             <AlphaCardLogoBanner />
 
             <div className="px-6 py-6 sm:px-8">
-              <div className="text-center">
-                <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-[#7fb3ff]">
+              <div className="flex flex-col items-center text-center">
+                <OmegaLockup size="md" theme="dark" showSubtitle={false} />
+                <p className="mt-2 text-[11px] font-bold uppercase tracking-[0.2em] text-[#7fb3ff]">
                   Alpha &amp; Omega &middot; God the Beginning and the End
                 </p>
                 <h1 className="mt-1 text-xl font-bold text-white sm:text-2xl">
@@ -77,10 +79,16 @@ export default function AboutPage() {
 
               <div className="mt-5 flex flex-wrap items-center justify-center gap-3">
                 <Link
-                  href="/login"
+                  href="/dashboard"
                   className="inline-flex items-center justify-center rounded-md bg-[#2767b9] px-5 py-2 text-xs font-semibold text-white transition hover:bg-[#1f569d] sm:text-sm"
                 >
-                  Sign In
+                  Open Portal
+                </Link>
+                <Link
+                  href="/leaders"
+                  className="inline-flex items-center justify-center rounded-md border border-white/25 bg-white/10 px-5 py-2 text-xs font-semibold text-white transition hover:bg-white/20 sm:text-sm"
+                >
+                  Chapter Leadership
                 </Link>
                 <Link
                   href="/signup"
@@ -100,4 +108,5 @@ export default function AboutPage() {
     </div>
   );
 }
+
 
