@@ -83,3 +83,67 @@ export function formatAmplitude(value: Complex): string {
   const sign = value.im < 0 ? "−" : "+";
   return `${re} ${sign} ${trim(Math.abs(value.im))}i`;
 }
+
+/**
+ * Constructs a pure single-qubit state |ψ⟩ = cos(θ/2)|0⟩ + e^(iφ) sin(θ/2)|1⟩
+ * from spherical Bloch coordinates θ ∈ [0, π] and φ ∈ [0, 2π].
+ */
+export function stateFromAngles(thetaRad: number, phiRad: number): QubitState {
+  const half = thetaRad / 2;
+  const cosH = Math.cos(half);
+  const sinH = Math.sin(half);
+  return [
+    c(cosH, 0),
+    c(sinH * Math.cos(phiRad), sinH * Math.sin(phiRad)),
+  ];
+}
+
+/**
+ * Extracts spherical angles (thetaDeg ∈ [0, 180], phiDeg ∈ [0, 360]) from a Bloch vector.
+ */
+export function blochAngles(vector: {
+  x: number;
+  y: number;
+  z: number;
+}): { thetaDeg: number; phiDeg: number } {
+  const clampedZ = Math.max(-1, Math.min(1, vector.z));
+  const thetaRad = Math.acos(clampedZ);
+  let phiRad = Math.atan2(vector.y, vector.x);
+  if (phiRad < 0) phiRad += 2 * Math.PI;
+  return {
+    thetaDeg: Math.round((thetaRad * 180) / Math.PI),
+    phiDeg: Math.round((phiRad * 180) / Math.PI) % 360,
+  };
+}
+
+/**
+ * Applies a continuous Pauli rotation gate Rx(θ), Ry(θ), or Rz(θ) to |ψ⟩.
+ */
+export function applyRotation(
+  axis: "X" | "Y" | "Z",
+  angleRad: number,
+  state: QubitState,
+): QubitState {
+  const half = angleRad / 2;
+  const ch = Math.cos(half);
+  const sh = Math.sin(half);
+  const [a, b] = state;
+
+  if (axis === "X") {
+    // Rx(θ) = [[cos(θ/2), -i sin(θ/2)], [-i sin(θ/2), cos(θ/2)]]
+    return [
+      add(mul(c(ch, 0), a), mul(c(0, -sh), b)),
+      add(mul(c(0, -sh), a), mul(c(ch, 0), b)),
+    ];
+  }
+  if (axis === "Y") {
+    // Ry(θ) = [[cos(θ/2), -sin(θ/2)], [sin(θ/2), cos(θ/2)]]
+    return [
+      add(mul(c(ch, 0), a), mul(c(-sh, 0), b)),
+      add(mul(c(sh, 0), a), mul(c(ch, 0), b)),
+    ];
+  }
+  // Rz(θ) = [[e^(-iθ/2), 0], [0, e^(iθ/2)]]
+  return [mul(c(ch, -sh), a), mul(c(ch, sh), b)];
+}
+
