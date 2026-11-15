@@ -23,6 +23,7 @@ const navSections = [
       { href: "/bloch", label: "Bloch Sphere" },
       { href: "/algorithms/deutsch-jozsa", label: "Deutsch-Jozsa" },
       { href: "/algorithms/grover", label: "Grover Search" },
+      { href: "/algorithms/bb84", label: "BB84 Cryptography" },
     ],
   },
   {
